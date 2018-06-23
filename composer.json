@@ -1,0 +1,52 @@
+{
+    "name": "sweetchuck/robo-php-lint",
+    "description": "Template to create a new Robo task.",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "bin-dir": "bin",
+        "sort-packages": true
+    },
+    "repositories": {
+        "sweetchuck/cli-cmd-builder": {
+            "type": "path",
+            "url": "../../sweetchuck/cli-cmd-builder"
+        }
+    },
+    "require": {
+        "php": ">=7.1",
+        "consolidation/robo": "^1.0",
+        "sweetchuck/cli-cmd-builder": "dev-master"
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.2",
+        "danielstjules/stringy": "^3.0",
+        "sweetchuck/codeception-module-robo-task-runner": "^0.4",
+        "sweetchuck/git-hooks": "^0.0",
+        "sweetchuck/robo-git": "^0.0",
+        "sweetchuck/robo-phpcs": "^0.0",
+        "webmozart/path-util": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sweetchuck\\Robo\\PhpLint\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sweetchuck\\Robo\\PhpLint\\Composer\\": "src-dev/Composer/",
+            "Sweetchuck\\Robo\\PhpLint\\Test\\Helper\\": "tests/_support/Helper/",
+            "Sweetchuck\\Robo\\PhpLint\\Tests\\Acceptance\\": "tests/acceptance/",
+            "Sweetchuck\\Robo\\PhpLint\\Tests\\Unit\\": "tests/unit/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "\\Sweetchuck\\Robo\\PhpLint\\Composer\\Scripts::postInstallCmd"
+        ],
+        "post-update-cmd": [
+            "\\Sweetchuck\\Robo\\PhpLint\\Composer\\Scripts::postUpdateCmd"
+        ]
+    }
+}
