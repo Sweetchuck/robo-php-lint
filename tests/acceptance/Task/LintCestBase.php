@@ -2,6 +2,8 @@
 
 namespace Sweetchuck\Robo\PhpLint\Tests\Acceptance\Task;
 
+use Webmozart\PathUtil\Path;
+
 class LintCestBase
 {
     protected function getDefaultPhpDefinitions(): string
@@ -18,10 +20,6 @@ class LintCestBase
 
     protected function getFixturesDir(): string
     {
-        return preg_replace(
-            '/^' . preg_quote(getcwd() . '/', '/') . '/',
-            '',
-            codecept_data_dir('fixtures')
-        );
+        return Path::makeRelative(codecept_data_dir('fixtures'), getcwd());
     }
 }

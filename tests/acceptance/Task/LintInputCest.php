@@ -26,19 +26,28 @@ class LintInputCest extends LintCestBase
 
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
+        $expectedExitCode = 0;
         $expectedStdOutput = '';
-        $expectedStdError = implode(PHP_EOL, [
-            ' [PHP Lint input] 2 files',
-            "  RUN  cat 'tests/_data/fixtures/true.01.php' | php -n $phpDefinitions -l 1>'/dev/null'",
-            '  RES  Command ran successfully',
-            "  RUN  cat 'tests/_data/fixtures/true.02.php' | php -n $phpDefinitions -l 1>'/dev/null'",
-            '  RES  Command ran successfully',
-            '',
-        ]);
+        $expectedStdErrorStartsWith = ' [PHP Lint input] 2 files' . PHP_EOL;
+        $expectedStdErrorContains = [
+            implode(PHP_EOL, [
+                "  RUN  cat 'tests/_data/fixtures/true.01.php' | php -n $phpDefinitions -l 1>'/dev/null'",
+                '  RES  Command ran successfully',
+                '',
+            ]),
+            implode(PHP_EOL, [
+                "  RUN  cat 'tests/_data/fixtures/true.02.php' | php -n $phpDefinitions -l 1>'/dev/null'",
+                '  RES  Command ran successfully',
+                '',
+            ]),
+        ];
 
-        $I->assertSame(0, $exitCode);
+        $I->assertSame($expectedExitCode, $exitCode);
         $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertSame($expectedStdError, $stdError);
+        $I->assertStringStartsWith($expectedStdErrorStartsWith, $stdError);
+        foreach ($expectedStdErrorContains as $expectedFragment) {
+            $I->assertContains($expectedFragment, $stdError);
+        }
     }
 
     public function phpLintInputCommandFalse(AcceptanceTester $I)
@@ -60,11 +69,12 @@ class LintInputCest extends LintCestBase
 
         $expectedExitCode = 255;
         $expectedStdOutput = '';
-        $expectedStdError = implode(PHP_EOL, [
-            ' [PHP Lint input] 2 files',
+        $expectedStdErrorStartsWith = ' [PHP Lint input] 2 files' . PHP_EOL;
+        $expectedStdErrorContains = [
             sprintf($pattern, 'false.01.php', 11),
-            ' ',
             sprintf($pattern, 'false.02.php', 11),
+        ];
+        $expectedStdErrorEndsWith = implode(PHP_EOL, [
             ' ',
             ' [Sweetchuck\Robo\PhpLint\Task\LintInputTask]   ',
             ' [Sweetchuck\Robo\PhpLint\Task\LintInputTask]  Exit code 255 ',
@@ -74,6 +84,10 @@ class LintInputCest extends LintCestBase
 
         $I->assertSame($expectedExitCode, $exitCode);
         $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertSame($expectedStdError, $stdError);
+        $I->assertStringStartsWith($expectedStdErrorStartsWith, $stdError);
+        foreach ($expectedStdErrorContains as $expectedFragment) {
+            $I->assertContains($expectedFragment, $stdError);
+        }
+        $I->assertRegExp('/' . preg_quote($expectedStdErrorEndsWith) . '$/u', $stdError);
     }
 }

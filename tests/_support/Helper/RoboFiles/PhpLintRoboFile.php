@@ -18,7 +18,6 @@ class PhpLintRoboFile extends Tasks
      */
     public function phpLintFilesDefault(
         array $options = [
-            'workingDirectory' => '',
             'parallelizer' => '',
             'fileNamePatterns' => [],
         ]
@@ -26,7 +25,6 @@ class PhpLintRoboFile extends Tasks
         $lintOptions = array_filter(array_intersect_key(
             $options,
             array_flip([
-                'workingDirectory',
                 'parallelizer',
                 'fileNamePatterns',
             ])
@@ -44,20 +42,18 @@ class PhpLintRoboFile extends Tasks
      */
     public function phpLintFilesCustom(
         array $options = [
-            'workingDirectory' => '',
             'parallelizer' => '',
             'fileNamePattern' => '*.php',
         ]
     ): TaskInterface {
         $fileListerCommand = sprintf(
             'for fileName in %s; do echo -n $fileName"\\0"; done',
-            ($options['workingDirectory'] ?: '.') . '/' . $options['fileNamePattern']
+            $options['fileNamePattern']
         );
 
         $lintOptions = array_intersect_key(
             $options,
             array_flip([
-                'workingDirectory',
                 'parallelizer',
                 'fileNamePatterns',
             ])

@@ -10,6 +10,7 @@
     },
     "require": {
         "php": ">=7.1",
+        "ext-pcre": "*",
         "consolidation/robo": "^1.0",
         "sweetchuck/cli-cmd-builder": "^0.0"
     },
