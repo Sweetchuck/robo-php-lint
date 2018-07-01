@@ -8,16 +8,10 @@
         "bin-dir": "bin",
         "sort-packages": true
     },
-    "repositories": {
-        "sweetchuck/cli-cmd-builder": {
-            "type": "path",
-            "url": "../../sweetchuck/cli-cmd-builder"
-        }
-    },
     "require": {
         "php": ">=7.1",
         "consolidation/robo": "^1.0",
-        "sweetchuck/cli-cmd-builder": "dev-master"
+        "sweetchuck/cli-cmd-builder": "^0.0"
     },
     "require-dev": {
         "codeception/codeception": "^2.2",

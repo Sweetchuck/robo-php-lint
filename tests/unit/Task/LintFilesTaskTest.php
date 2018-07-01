@@ -3,6 +3,7 @@
 namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
 use Codeception\Test\Unit;
+use Sweetchuck\CliCmdBuilder\CommandBuilder;
 use Sweetchuck\Robo\PhpLint\Task\LintFilesTask;
 
 class LintFilesTaskTest extends Unit
@@ -83,6 +84,17 @@ class LintFilesTaskTest extends Unit
                 [
                     'parallelizer' => 'parallel',
                     'fileListerCommand' => 'cat files.txt',
+                ],
+            ],
+            'fileListerCommand CliCmdBuilder' => [
+                "git ls-files -- '*.php' | $parallelCommandDefault $defaultPhpCommandParallel",
+                [
+                    'parallelizer' => 'parallel',
+                    'fileListerCommand' => (new CommandBuilder())
+                        ->setExecutable('git')
+                        ->addArgument('ls-files', 'single:safe')
+                        ->addArgument('--', 'single:safe')
+                        ->addArgument('*.php'),
                 ],
             ],
         ];
