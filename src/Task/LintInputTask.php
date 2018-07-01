@@ -149,7 +149,8 @@ class LintInputTask extends BaseTask
                 break;
 
             case Process::ERR:
-                $data = preg_replace('/(?<= in )-(?= on line \d+)/', $this->currentFile['fileName'], $data);
+                $pattern = '/(?<= in )(-|Standard input code)(?= on line \d+)/';
+                $data = preg_replace($pattern, $this->currentFile['fileName'], $data);
                 $this->printTaskError($data);
                 break;
         }
