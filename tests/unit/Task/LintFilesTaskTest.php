@@ -2,16 +2,25 @@
 
 namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
-use Codeception\Test\Unit;
 use Sweetchuck\CliCmdBuilder\CommandBuilder;
-use Sweetchuck\Robo\PhpLint\Task\LintFilesTask;
+use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
+use Sweetchuck\Robo\PhpLint\Test\Helper\Dummy\DummyTaskBuilder;
 
-class LintFilesTaskTest extends Unit
+class LintFilesTaskTest extends TaskTestBase
 {
+
     /**
-     * @var \Sweetchuck\Robo\PhpLint\Test\UnitTester
+     * {@inheritdoc}
      */
-    protected $tester;
+    protected function initTask()
+    {
+        $taskBuilder = new DummyTaskBuilder();
+        $taskBuilder->setContainer($this->container);
+
+        $this->task = $taskBuilder->taskPhpLintFiles();
+
+        return $this;
+    }
 
     public function casesGetCommand(): array
     {
@@ -33,27 +42,35 @@ class LintFilesTaskTest extends Unit
         $defaultPhpCommand = sprintf("php -n %s -l", implode(' ', $defaultPhpCommandDefinitions));
         $defaultPhpCommandParallel = "\"$defaultPhpCommand {} 1>'/dev/null'\"";
 
-        $methodIsShellCallableParallel = function (string $executable): bool {
-            return $executable === 'parallel';
-        };
+        $exitCode0 = [
+            'exitCode' => 0,
+            'stdOutput' => '',
+            'stdError' => '',
 
-        $methodIsShellCallableXargs = function (string $executable): bool {
-            return $executable === 'xargs';
-        };
+        ];
+        $exitCode1 = [
+            'exitCode' => 1,
+            'stdOutput' => '',
+            'stdError' => '',
+        ];
 
         return [
             'default auto parallel' => [
                 "$listFilesCommandDefault | $parallelCommandDefault $defaultPhpCommandParallel",
                 [],
                 [
-                    'isShellCallable' => $methodIsShellCallableParallel,
+                    $exitCode0,
+                    $exitCode0,
                 ],
             ],
             'default auto xargs' => [
                 "$listFilesCommandDefault | $xargsCommandDefault $defaultPhpCommand",
                 [],
                 [
-                    'isShellCallable' => $methodIsShellCallableXargs,
+                    $exitCode1,
+                    $exitCode0,
+                    $exitCode1,
+                    $exitCode0,
                 ],
             ],
             'default parallel' => [
@@ -103,13 +120,15 @@ class LintFilesTaskTest extends Unit
     /**
      * @dataProvider casesGetCommand
      */
-    public function testGetCommand(string $expected, array $options = [], array $params = [])
+    public function testGetCommand(string $expected, array $options = [], array $processResults = [])
     {
-        /** @var \Sweetchuck\Robo\PhpLint\Task\LintFilesTask $task */
-        $task = $this->construct(LintFilesTask::class, [], $params);
+        foreach ($processResults as $processResult) {
+            DummyProcess::$prophecy[] = $processResult;
+        }
+
         $this->tester->assertSame(
             $expected,
-            $task
+            $this->task
                 ->setOptions($options)
                 ->getCommand()
         );

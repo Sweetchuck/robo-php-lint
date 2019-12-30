@@ -118,7 +118,7 @@ class LintFilesTask extends BaseTask
     /**
      * {@inheritdoc}
      */
-    public function getCommand()
+    public function buildCommand(): array
     {
         $fileListerCommand = $this->getFileListerCommand() ?: $this->getDefaultFileListerCommand();
         $parallelizerCommand = $this->getParallelizerCommand();
@@ -136,15 +136,15 @@ class LintFilesTask extends BaseTask
         }
 
         if ($parallelizerCommand) {
-            return sprintf(
-                '%s | %s %s',
+            return [
                 (string) $fileListerCommand,
+                '|',
                 (string) $parallelizerCommand,
-                (string) $phpCommand->build($phpCommandConfigOverrides)
-            );
+                (string) $phpCommand->build($phpCommandConfigOverrides),
+            ];
         }
 
-        return '@todo';
+        return [];
     }
 
     protected function getDefaultFileListerCommand(): CliCmdBuilderInterface

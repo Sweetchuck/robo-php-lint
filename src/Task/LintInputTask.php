@@ -58,14 +58,16 @@ class LintInputTask extends BaseTask
     /**
      * {@inheritdoc}
      */
-    public function getCommand()
+    public function buildCommand(): array
     {
         $commands = [];
         foreach ($this->getFiles() as $fileName => $file) {
-            $commands[] = $this->getMainCommand($this->normalizeFile($fileName, $file));
+            $commands = array_merge($commands, $this->getMainCommand($this->normalizeFile($fileName, $file)));
+            $commands[] = '&&';
         }
+        array_pop($commands);
 
-        return implode(' && ', $commands);
+        return $commands;
     }
 
     protected function runHeader()
@@ -108,13 +110,13 @@ class LintInputTask extends BaseTask
             : ['fileName' => $fileName, 'content' => $file];
     }
 
-    protected function getMainCommand(array $file): string
+    protected function getMainCommand(array $file): array
     {
-        return sprintf(
-            '%s | %s',
+        return [
             $this->getContentCommand($file),
-            (string) $this->getPhpCommand()
-        );
+            '|',
+            (string) $this->getPhpCommand(),
+        ];
     }
 
     protected function getPhpCommand(): CliCmdBuilderInterface

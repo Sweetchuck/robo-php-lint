@@ -9,17 +9,18 @@
         "sort-packages": true
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.2",
         "ext-pcre": "*",
-        "consolidation/robo": "^1.0",
+        "consolidation/robo": "^2.0",
         "sweetchuck/cli-cmd-builder": "^0.0"
     },
     "require-dev": {
-        "codeception/codeception": "^2.2",
+        "codeception/codeception": "^4.0",
+        "codeception/module-asserts": "^1.1",
         "danielstjules/stringy": "^3.0",
-        "sweetchuck/codeception-module-robo-task-runner": "^0.4",
+        "sweetchuck/codeception-module-robo-task-runner": "^0.7",
         "sweetchuck/git-hooks": "^0.0",
-        "sweetchuck/robo-git": "^0.0",
+        "sweetchuck/robo-git": "^0.2",
         "sweetchuck/robo-phpcs": "^0.0",
         "webmozart/path-util": "^2.3"
     },

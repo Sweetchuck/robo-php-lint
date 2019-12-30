@@ -4,13 +4,23 @@ namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
 use Codeception\Test\Unit;
 use Sweetchuck\Robo\PhpLint\Task\LintInputTask;
+use Sweetchuck\Robo\PhpLint\Test\Helper\Dummy\DummyTaskBuilder;
 
-class LintInputTaskTest extends Unit
+class LintInputTaskTest extends TaskTestBase
 {
+
     /**
-     * @var \Sweetchuck\Robo\PhpLint\Test\UnitTester
+     * {@inheritdoc}
      */
-    protected $tester;
+    protected function initTask()
+    {
+        $taskBuilder = new DummyTaskBuilder();
+        $taskBuilder->setContainer($this->container);
+
+        $this->task = $taskBuilder->taskPhpLintInput();
+
+        return $this;
+    }
 
     public function casesGetCommand(): array
     {
@@ -73,11 +83,9 @@ class LintInputTaskTest extends Unit
      */
     public function testGetCommand(string $expected, array $options = [])
     {
-        /** @var \Sweetchuck\Robo\PhpLint\Task\LintInputTask $task */
-        $task = $this->construct(LintInputTask::class);
         $this->tester->assertSame(
             $expected,
-            $task
+            $this->task
                 ->setOptions($options)
                 ->getCommand()
         );

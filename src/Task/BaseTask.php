@@ -166,7 +166,11 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
     /**
      * {@inheritdoc}
      */
-    abstract public function getCommand();
+    public function getCommand() {
+        return implode(' ', $this->buildCommand());
+    }
+
+    abstract public function buildCommand(): array;
 
     /**
      * {@inheritdoc}
@@ -342,7 +346,7 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
 
     protected function isShellCallable(string $executable): bool
     {
-        $command = sprintf('type %s', escapeshellarg($executable));
+        $command = ['type', escapeshellarg($executable)];
 
         $exitCode = $this
             ->getProcessHelper()
