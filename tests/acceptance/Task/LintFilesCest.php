@@ -29,13 +29,12 @@ class LintFilesCest extends LintCestBase
             ' [PHP Lint files]',
             "git ls-files -z -- '$fixturesDir/true.*.php'",
             '|',
-            'parallel --null',
-            "\"php -n $phpDefinitions -l {} 1>'/dev/null'",
+            'parallel --null ' . escapeshellarg("php -n $phpDefinitions -l {} 1>/dev/null"),
         ]);
 
-        $I->assertSame(0, $exitCode);
-        $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertContains($expectedStdError, $stdError);
+        $I->assertSame($expectedStdOutput, $stdOutput, 'stdOutput');
+        $I->assertStringContainsString($expectedStdError, $stdError, 'stdError');
+        $I->assertSame(0, $exitCode, 'exitCode');
     }
 
     public function phpLintFilesDefaultTrueXargs(AcceptanceTester $I)
@@ -64,13 +63,13 @@ class LintFilesCest extends LintCestBase
             ' [PHP Lint files]',
             "git ls-files -z -- '$fixturesDir/true.*.php'",
             '|',
-            'xargs -0 --max-args=\'1\' --max-procs="$(nproc)"',
+            'xargs -0 --max-args=1 --max-procs="$(nproc)"',
             "php -n $phpDefinitions -l\n",
         ]);
 
-        $I->assertSame(0, $exitCode);
         $I->assertSame($expectedStdOutput, $this->sortLines($stdOutput));
         $I->assertStringStartsWith($expectedStdError, $stdError);
+        $I->assertSame(0, $exitCode);
     }
 
     public function phpLintFilesDefaultFalseParallel(AcceptanceTester $I)
@@ -95,13 +94,12 @@ class LintFilesCest extends LintCestBase
             ' [PHP Lint files]',
             "git ls-files -z -- '$fixturesDir/*.php'",
             '|',
-            'parallel --null',
-            "\"php -n $phpDefinitions -l {} 1>'/dev/null'",
+            'parallel --null ' . escapeshellarg("php -n $phpDefinitions -l {} 1>/dev/null"),
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
         $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertContains($expectedStdError, $stdError);
+        $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
     public function phpLintFilesDefaultFalseXargs(AcceptanceTester $I)
@@ -133,7 +131,7 @@ class LintFilesCest extends LintCestBase
             ' [PHP Lint files]',
             "git ls-files -z -- '$fixturesDir/*.php'",
             '|',
-            'xargs -0 --max-args=\'1\' --max-procs="$(nproc)"',
+            'xargs -0 --max-args=1 --max-procs="$(nproc)"',
             "php -n $phpDefinitions -l\n",
         ]);
 
@@ -164,13 +162,12 @@ class LintFilesCest extends LintCestBase
             ' [PHP Lint files]',
             "for fileName in $fixturesDir/true.*.php; do echo -n \$fileName\"\\0\"; done",
             '|',
-            'parallel --null',
-            "\"php -n $phpDefinitions -l {} 1>'/dev/null'",
+            'parallel --null ' . escapeshellarg("php -n $phpDefinitions -l {} 1>/dev/null"),
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
-        $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertContains($expectedStdError, $stdError);
+        $I->assertSame($expectedStdOutput, $stdOutput, 'stdOutput');
+        $I->assertStringContainsString($expectedStdError, $stdError, 'stdError');
     }
 
     public function phpLintFilesCustomTrueXargs(AcceptanceTester $I)
@@ -196,13 +193,13 @@ class LintFilesCest extends LintCestBase
             ' [PHP Lint files]',
             "for fileName in $fixturesDir/true.*.php; do echo -n \$fileName\"\\0\"; done",
             '|',
-            'xargs -0 --max-args=\'1\' --max-procs="$(nproc)"',
+            'xargs -0 --max-args=1 --max-procs="$(nproc)"',
             "php -n $phpDefinitions -l" . PHP_EOL,
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
         $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertContains($expectedStdError, $stdError);
+        $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
     public function phpLintFilesCustomFalseParallel(AcceptanceTester $I)
@@ -227,13 +224,12 @@ class LintFilesCest extends LintCestBase
             ' [PHP Lint files]',
             "for fileName in $fixturesDir/*.php; do echo -n \$fileName\"\\0\"; done",
             '|',
-            'parallel --null',
-            "\"php -n $phpDefinitions -l {} 1>'/dev/null'",
+            'parallel --null ' . escapeshellarg("php -n $phpDefinitions -l {} 1>/dev/null"),
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
         $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertContains($expectedStdError, $stdError);
+        $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
     public function phpLintFilesCustomFalseXargs(AcceptanceTester $I)
@@ -259,13 +255,13 @@ class LintFilesCest extends LintCestBase
             ' [PHP Lint files]',
             "for fileName in $fixturesDir/*.php; do echo -n \$fileName\"\\0\"; done",
             '|',
-            'xargs -0 --max-args=\'1\' --max-procs="$(nproc)"',
+            'xargs -0 --max-args=1 --max-procs="$(nproc)"',
             "php -n $phpDefinitions -l" . PHP_EOL,
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
         $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertContains($expectedStdError, $stdError);
+        $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
     protected function sortLines(string $text): string

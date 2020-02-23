@@ -2,74 +2,118 @@
 
 namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
-use Codeception\Test\Unit;
-use Sweetchuck\CliCmdBuilder\CommandBuilder;
-use Sweetchuck\Robo\PhpLint\Task\LintFilesTask;
+use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
+use Sweetchuck\Robo\PhpLint\Test\Helper\Dummy\DummyTaskBuilder;
 
-class LintFilesTaskTest extends Unit
+class LintFilesTaskTest extends TaskTestBase
 {
-    /**
-     * @var \Sweetchuck\Robo\PhpLint\Test\UnitTester
-     */
-    protected $tester;
 
-    public function casesGetCommand(): array
+    /**
+     * {@inheritdoc}
+     */
+    protected function initTask()
+    {
+        $taskBuilder = new DummyTaskBuilder();
+        $taskBuilder->setContainer($this->container);
+
+        $this->task = $taskBuilder->taskPhpLintFiles();
+
+        return $this;
+    }
+
+    public function casesBuildCommand(): array
     {
         $listFilesCommandDefault = "git ls-files -z -- '*.php'";
         $listFilesCommandFileNamePatterns = "git ls-files -z -- '*.php' '*.module' '*.install'";
 
-        $xargsCommandDefault = "xargs -0 --max-args='1' --max-procs=\"$(nproc)\"";
+        $xargsCommandDefault = "xargs -0 --max-args=1 --max-procs=\"$(nproc)\"";
 
-        $parallelCommandDefault = "parallel --null";
+        $parallelCommandDefault = 'parallel --null';
 
-        $defaultPhpCommandDefinitions = [
+        $defaultPhpCommand = implode(' ', [
+            'php',
+            '-n',
             "-d 'display_errors=STDERR'",
             "-d 'error_reporting=E_ALL'",
             "-d 'log_errors=On'",
             "-d 'error_log=/dev/null'",
             "-d 'sort_open_tag=Off'",
             "-d 'asp_tags=Off'",
+            '-l',
+        ]);
+
+        $defaultPhpCommandParallel = escapeshellarg($defaultPhpCommand . ' {} 1>/dev/null');
+
+        $exitCode0 = [
+            'exitCode' => 0,
+            'stdOutput' => '',
+            'stdError' => '',
+
         ];
-        $defaultPhpCommand = sprintf("php -n %s -l", implode(' ', $defaultPhpCommandDefinitions));
-        $defaultPhpCommandParallel = "\"$defaultPhpCommand {} 1>'/dev/null'\"";
-
-        $methodIsShellCallableParallel = function (string $executable): bool {
-            return $executable === 'parallel';
-        };
-
-        $methodIsShellCallableXargs = function (string $executable): bool {
-            return $executable === 'xargs';
-        };
+        $exitCode1 = [
+            'exitCode' => 1,
+            'stdOutput' => '',
+            'stdError' => '',
+        ];
 
         return [
             'default auto parallel' => [
-                "$listFilesCommandDefault | $parallelCommandDefault $defaultPhpCommandParallel",
+                [
+                    $listFilesCommandDefault,
+                    '|',
+                    $parallelCommandDefault,
+                    $defaultPhpCommandParallel,
+                ],
                 [],
                 [
-                    'isShellCallable' => $methodIsShellCallableParallel,
+                    $exitCode0,
+                    $exitCode0,
                 ],
             ],
             'default auto xargs' => [
-                "$listFilesCommandDefault | $xargsCommandDefault $defaultPhpCommand",
+                [
+                    $listFilesCommandDefault,
+                    '|',
+                    $xargsCommandDefault,
+                    $defaultPhpCommand,
+                ],
                 [],
                 [
-                    'isShellCallable' => $methodIsShellCallableXargs,
+                    $exitCode1,
+                    $exitCode0,
+                    $exitCode1,
+                    $exitCode0,
                 ],
             ],
             'default parallel' => [
-                "$listFilesCommandDefault | $parallelCommandDefault $defaultPhpCommandParallel",
+                [
+                    $listFilesCommandDefault,
+                    '|',
+                    $parallelCommandDefault,
+                    $defaultPhpCommandParallel,
+                ],
                 [
                     'parallelizer' => 'parallel',
                 ],
             ],
             'default xargs' => [
-                "$listFilesCommandDefault | $xargsCommandDefault $defaultPhpCommand",
+                [
+                    $listFilesCommandDefault,
+                    '|',
+                    $xargsCommandDefault,
+                    $defaultPhpCommand,
+                ],
                 [
                     'parallelizer' => 'xargs',
                 ],
             ],
             'default fileNamePatterns' => [
-                "$listFilesCommandFileNamePatterns | $parallelCommandDefault $defaultPhpCommandParallel",
+                [
+                    $listFilesCommandFileNamePatterns,
+                    '|',
+                    $parallelCommandDefault,
+                    $defaultPhpCommandParallel,
+                ],
                 [
                     'parallelizer' => 'parallel',
                     'fileNamePatterns' => [
@@ -80,38 +124,34 @@ class LintFilesTaskTest extends Unit
                 ],
             ],
             'fileListerCommand string' => [
-                "cat files.txt | $parallelCommandDefault $defaultPhpCommandParallel",
+                [
+                    'cat files.txt',
+                    '|',
+                    $parallelCommandDefault,
+                    $defaultPhpCommandParallel,
+                ],
                 [
                     'parallelizer' => 'parallel',
                     'fileListerCommand' => 'cat files.txt',
-                ],
-            ],
-            'fileListerCommand CliCmdBuilder' => [
-                "git ls-files -- '*.php' | $parallelCommandDefault $defaultPhpCommandParallel",
-                [
-                    'parallelizer' => 'parallel',
-                    'fileListerCommand' => (new CommandBuilder())
-                        ->setExecutable('git')
-                        ->addArgument('ls-files', 'single:safe')
-                        ->addArgument('--', 'single:safe')
-                        ->addArgument('*.php'),
                 ],
             ],
         ];
     }
 
     /**
-     * @dataProvider casesGetCommand
+     * @dataProvider casesBuildCommand
      */
-    public function testGetCommand(string $expected, array $options = [], array $params = [])
+    public function testBuildCommand(array $expected, array $options = [], array $processResults = [])
     {
-        /** @var \Sweetchuck\Robo\PhpLint\Task\LintFilesTask $task */
-        $task = $this->construct(LintFilesTask::class, [], $params);
+        foreach ($processResults as $processResult) {
+            DummyProcess::$prophecy[] = $processResult;
+        }
+
         $this->tester->assertSame(
             $expected,
-            $task
+            $this->task
                 ->setOptions($options)
-                ->getCommand()
+                ->buildCommand()
         );
     }
 }
