@@ -10,8 +10,6 @@ use Robo\Contract\OutputAwareInterface;
 use Robo\Result;
 use Robo\Task\BaseTask as RoboBaseTask;
 use Robo\TaskInfo;
-use Sweetchuck\CliCmdBuilder\CliCmdBuilderInterface;
-use Sweetchuck\CliCmdBuilder\CommandBuilder;
 use Sweetchuck\Robo\PhpLint\Utils as PhpLintUtils;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Process\Process;
@@ -25,6 +23,11 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
      * @var string
      */
     protected $taskName = 'PHP lint';
+
+    /**
+     * @var string
+     */
+    protected $shell = 'bash';
 
     /**
      * @var string
@@ -166,7 +169,8 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
     /**
      * {@inheritdoc}
      */
-    public function getCommand() {
+    public function getCommand()
+    {
         return implode(' ', $this->buildCommand());
     }
 
@@ -214,7 +218,11 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         $processHelper = $this->getProcessHelper();
         $process = $processHelper->run(
             $this->output(),
-            $this->command,
+            [
+                $this->shell,
+                '-c',
+                $this->command,
+            ],
             null,
             $this->processRunCallbackWrapper
         );
@@ -297,14 +305,24 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this->taskName ?: TaskInfo::formatTaskName($this);
     }
 
-    protected function getPhpCommand(): CliCmdBuilderInterface
+    /**
+     * @return string[]
+     */
+    protected function getPhpCommand(): string
     {
-        return (new CommandBuilder())
-            ->setConfig(['optionSeparator' => ' '])
-            ->setExecutable($this->getPhpExecutable())
-            ->addOption('-n')
-            ->addOption('-d', PhpLintUtils::buildKeyValueStrings($this->getPhpIniDefinitions()))
-            ->addOption('-l');
+        $cmd = [
+            escapeshellcmd($this->getPhpExecutable()),
+            '-n',
+        ];
+
+        $definitions = PhpLintUtils::buildKeyValueStrings($this->getPhpIniDefinitions());
+        foreach ($definitions as $definition) {
+            $cmd[] = '-d ' . escapeshellarg($definition);
+        }
+
+        $cmd[] = '-l';
+
+        return implode(' ', $cmd);
     }
 
     protected function getPhpIniDefinitions(): array
@@ -346,11 +364,16 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
 
     protected function isShellCallable(string $executable): bool
     {
-        $command = ['type', escapeshellarg($executable)];
-
         $exitCode = $this
             ->getProcessHelper()
-            ->run($this->output(), $command)
+            ->run(
+                $this->output(),
+                [
+                    $this->shell,
+                    '-c',
+                    'type ' . escapeshellarg($executable),
+                ]
+            )
             ->getExitCode();
 
         return $exitCode === 0;

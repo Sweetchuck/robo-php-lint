@@ -2,6 +2,22 @@
     "name": "sweetchuck/robo-php-lint",
     "description": "Template to create a new Robo task.",
     "license": "GPL-2.0-or-later",
+    "keywords": [
+        "robo-tasks",
+        "php-lint"
+    ],
+    "authors": [
+        {
+            "name": "Dávid Andor",
+            "role": "Maintainer",
+            "homepage": "https://github.com/Sweetchuck"
+        }
+    ],
+    "homepage": "https://github.com/Sweetchuck/robo-php-lint",
+    "support": {
+        "source": "https://github.com/Sweetchuck/robo-php-lint",
+        "issues": "https://github.com/Sweetchuck/robo-php-lint/issues"
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
@@ -12,16 +28,17 @@
         "php": ">=7.2",
         "ext-pcre": "*",
         "consolidation/robo": "^2.0",
-        "sweetchuck/cli-cmd-builder": "^0.0"
+        "sweetchuck/utils": "^0.1.0"
     },
     "require-dev": {
         "codeception/codeception": "^4.0",
         "codeception/module-asserts": "^1.1",
         "danielstjules/stringy": "^3.0",
+        "squizlabs/php_codesniffer": "^3.5",
         "sweetchuck/codeception-module-robo-task-runner": "^0.7",
         "sweetchuck/git-hooks": "^0.0",
         "sweetchuck/robo-git": "^0.2",
-        "sweetchuck/robo-phpcs": "^0.0",
+        "sweetchuck/robo-phpcs": "^0.1",
         "webmozart/path-util": "^2.3"
     },
     "autoload": {

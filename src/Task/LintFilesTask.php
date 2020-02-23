@@ -2,9 +2,7 @@
 
 namespace Sweetchuck\Robo\PhpLint\Task;
 
-use Sweetchuck\CliCmdBuilder\CliCmdBuilderInterface;
-use Sweetchuck\CliCmdBuilder\CommandBuilder;
-use Sweetchuck\CliCmdBuilder\Utils;
+use Sweetchuck\Utils\Filter\ArrayFilterEnabled;
 
 class LintFilesTask extends BaseTask
 {
@@ -17,24 +15,24 @@ class LintFilesTask extends BaseTask
 
     // region fileListerCommand
     /**
-     * @var string|\Sweetchuck\CliCmdBuilder\CliCmdBuilderInterface
+     * @var string
      */
     protected $fileListerCommand = '';
 
     /**
-     * @return string|\Sweetchuck\CliCmdBuilder\CliCmdBuilderInterface
+     * @return string
      */
-    public function getFileListerCommand()
+    public function getFileListerCommand(): string
     {
         return $this->fileListerCommand;
     }
 
     /**
-     * @param string|\Sweetchuck\CliCmdBuilder\CliCmdBuilderInterface $value
+     * @param string $value
      *
      * @return $this
      */
-    public function setFileListerCommand($value)
+    public function setFileListerCommand(string $value)
     {
         $this->fileListerCommand = $value;
 
@@ -115,67 +113,65 @@ class LintFilesTask extends BaseTask
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildCommand(): array
     {
         $fileListerCommand = $this->getFileListerCommand() ?: $this->getDefaultFileListerCommand();
         $parallelizerCommand = $this->getParallelizerCommand();
         $phpCommand = $this->getPhpCommand();
 
-        $parallelizerCommandType = $this->getFinalParallelizerCommandType();
-        $phpCommandConfigOverrides = [];
-        if ($parallelizerCommandType === 'parallel') {
-            $phpCommandConfigOverrides['outputType'] = 'stringSafe';
-            if ($phpCommand instanceof CommandBuilder) {
-                $phpCommand
-                    ->addArgument('{}', 'single:safe')
-                    ->addComponent(['type' => 'redirectStdOutput', 'value' => '/dev/null']);
-            }
-        }
-
         if ($parallelizerCommand) {
+            $parallelizerCommandType = $this->getFinalParallelizerCommandType();
+            if ($parallelizerCommandType === 'parallel') {
+                $phpCommand = escapeshellarg($phpCommand . ' {} 1>/dev/null');
+            }
+
             return [
-                (string) $fileListerCommand,
+                $fileListerCommand,
                 '|',
-                (string) $parallelizerCommand,
-                (string) $phpCommand->build($phpCommandConfigOverrides),
+                $parallelizerCommand,
+                $phpCommand
             ];
         }
 
         return [];
     }
 
-    protected function getDefaultFileListerCommand(): CliCmdBuilderInterface
+  /**
+   * @return string
+   */
+    protected function getDefaultFileListerCommand(): string
     {
-        $cmdBuilder = new CommandBuilder();
-        $cmdBuilder->setExecutable('git');
+        $cmd = [];
 
         $wd = $this->getWorkingDirectory();
         if ($wd) {
-            $cmdBuilder
-                ->setExecutable('cd')
-                ->addArgument($wd, 'single:unsafe')
-                ->addArgument('&&', 'single:safe')
-                ->addArgument('git', 'single:safe');
+            $cmd[] = 'cd';
+            $cmd[] = escapeshellarg($wd);
+            $cmd[] = '&&';
         }
 
-        $fileNamePatterns = Utils::filterEnabled($this->getFileNamePatterns()) ?: ['*.php'];
+        $cmd[] = 'git';
+        $cmd[] = 'ls-files';
+        $cmd[] = '-z';
+        $cmd[] = '--';
 
-        $cmdBuilder
-            ->addArgument('ls-files', 'single:safe')
-            ->addOption('-z')
-            ->addComponent(['type' => 'argument:separator', 'value' => true]);
+        $fileNamePatterns = $this->getFileNamePatterns();
+        if (gettype(reset($fileNamePatterns)) === 'boolean') {
+            $fileNamePatterns = array_keys(array_filter($fileNamePatterns, new ArrayFilterEnabled()));
+        }
+
+        if (!$fileNamePatterns) {
+            $fileNamePatterns[] = '*.php';
+        }
 
         foreach ($fileNamePatterns as $fileNamePattern) {
-            $cmdBuilder->addArgument($fileNamePattern, 'single:unsafe');
+            $cmd[] = escapeshellarg($fileNamePattern);
         }
 
-        return $cmdBuilder;
+        return implode(' ', $cmd);
     }
 
-    protected function getParallelizerCommand(): ?CliCmdBuilderInterface
+    protected function getParallelizerCommand(): ?string
     {
         $parallelizerCommandType = $this->getFinalParallelizerCommandType();
         if ($parallelizerCommandType === 'xargs') {
@@ -189,24 +185,20 @@ class LintFilesTask extends BaseTask
         return null;
     }
 
-    protected function getParallelizerCommandParallel(): CliCmdBuilderInterface
+    /**
+     * @return string[]
+     */
+    protected function getParallelizerCommandParallel(): string
     {
-        return (new CommandBuilder())
-            ->setExecutable('parallel')
-            ->addOption('null');
+        return 'parallel --null';
     }
 
-    protected function getParallelizerCommandXargs(): CliCmdBuilderInterface
+    /**
+     * @return string
+     */
+    protected function getParallelizerCommandXargs(): string
     {
-        return (new CommandBuilder())
-            ->setExecutable('xargs')
-            ->addOption('-0')
-            ->addOption('max-args', '1', 'value')
-            ->addOption(
-                'max-procs',
-                (new CommandBuilder())->setExecutable('nproc'),
-                'value'
-            );
+        return 'xargs -0 --max-args=1 --max-procs="$(nproc)"';
     }
 
     protected function getFinalParallelizerCommandType(): string

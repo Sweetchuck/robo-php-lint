@@ -26,17 +26,19 @@ class LintInputCest extends LintCestBase
 
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
+        $cmdPattern = "cat 'tests/_data/fixtures/true.%02d.php' | php -n $phpDefinitions -l 1>/dev/null";
+
         $expectedExitCode = 0;
         $expectedStdOutput = '';
         $expectedStdErrorStartsWith = ' [PHP Lint input] 2 files' . PHP_EOL;
         $expectedStdErrorContains = [
             implode(PHP_EOL, [
-                "  RUN  cat 'tests/_data/fixtures/true.01.php' | php -n $phpDefinitions -l 1>'/dev/null'",
+                "  RUN  'bash' '-c' " . escapeshellarg(sprintf($cmdPattern, 1)),
                 '  RES  Command ran successfully',
                 '',
             ]),
             implode(PHP_EOL, [
-                "  RUN  cat 'tests/_data/fixtures/true.02.php' | php -n $phpDefinitions -l 1>'/dev/null'",
+                "  RUN  'bash' '-c' " . escapeshellarg(sprintf($cmdPattern, 2)),
                 '  RES  Command ran successfully',
                 '',
             ]),
@@ -46,7 +48,7 @@ class LintInputCest extends LintCestBase
         $I->assertSame($expectedStdOutput, $stdOutput);
         $I->assertStringStartsWith($expectedStdErrorStartsWith, $stdError);
         foreach ($expectedStdErrorContains as $expectedFragment) {
-            $I->assertContains($expectedFragment, $stdError);
+            $I->assertStringContainsString($expectedFragment, $stdError);
         }
     }
 
@@ -78,7 +80,6 @@ class LintInputCest extends LintCestBase
             ' ',
             ' [Sweetchuck\Robo\PhpLint\Task\LintInputTask]   ',
             ' [Sweetchuck\Robo\PhpLint\Task\LintInputTask]  Exit code 255 ',
-            ' [error]   ',
             '',
         ]);
 
@@ -86,8 +87,8 @@ class LintInputCest extends LintCestBase
         $I->assertSame($expectedStdOutput, $stdOutput);
         $I->assertStringStartsWith($expectedStdErrorStartsWith, $stdError);
         foreach ($expectedStdErrorContains as $expectedFragment) {
-            $I->assertContains($expectedFragment, $stdError);
+            $I->assertStringContainsString($expectedFragment, $stdError);
         }
-        $I->assertRegExp('/' . preg_quote($expectedStdErrorEndsWith) . '$/u', $stdError);
+        $I->assertStringEndsWith($expectedStdErrorEndsWith, $stdError);
     }
 }

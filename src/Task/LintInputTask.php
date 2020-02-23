@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Robo\PhpLint\Task;
 
-use Sweetchuck\CliCmdBuilder\CliCmdBuilderInterface;
 use Symfony\Component\Process\Process;
 
 class LintInputTask extends BaseTask
@@ -62,7 +61,7 @@ class LintInputTask extends BaseTask
     {
         $commands = [];
         foreach ($this->getFiles() as $fileName => $file) {
-            $commands = array_merge($commands, $this->getMainCommand($this->normalizeFile($fileName, $file)));
+            $commands[] = $this->getMainCommand($this->normalizeFile($fileName, $file));
             $commands[] = '&&';
         }
         array_pop($commands);
@@ -93,7 +92,11 @@ class LintInputTask extends BaseTask
             $this->currentFile = $this->normalizeFile($fileName, $file);
             $process = $processHelper->run(
                 $output,
-                $this->getMainCommand($this->currentFile),
+                [
+                    $this->shell,
+                    '-c',
+                    $this->getMainCommand($this->currentFile),
+                ],
                 null,
                 $this->processRunCallbackWrapper
             );
@@ -110,25 +113,24 @@ class LintInputTask extends BaseTask
             : ['fileName' => $fileName, 'content' => $file];
     }
 
-    protected function getMainCommand(array $file): array
+    protected function getMainCommand(array $file): string
     {
-        return [
+        return sprintf(
+            '%s | %s',
             $this->getContentCommand($file),
-            '|',
-            (string) $this->getPhpCommand(),
-        ];
+            $this->getPhpCommand()
+        );
     }
 
-    protected function getPhpCommand(): CliCmdBuilderInterface
+    /**
+     * @inheritdoc
+     */
+    protected function getPhpCommand(): string
     {
-        return parent::getPhpCommand()
-            ->addComponent([
-                'type' => 'redirectStdOutput',
-                'value' => '/dev/null',
-            ]);
+        return parent::getPhpCommand() . ' 1>/dev/null';
     }
 
-    protected function getContentCommand(array $file)
+    protected function getContentCommand(array $file): string
     {
         if (isset($file['content'])) {
             return sprintf(
@@ -140,9 +142,6 @@ class LintInputTask extends BaseTask
         return $file['command'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processRunCallback(string $type, string $data): void
     {
         switch ($type) {
