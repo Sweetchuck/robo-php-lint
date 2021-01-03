@@ -5,7 +5,6 @@
     xsi:noNamespaceSchemaLocation="./vendor/squizlabs/php_codesniffer/phpcs.xsd">
 
     <file>./src/</file>
-    <file>./src-dev/Composer/</file>
     <file>./tests/</file>
     <exclude-pattern>./tests/_data/</exclude-pattern>
     <exclude-pattern>./tests/_output/</exclude-pattern>

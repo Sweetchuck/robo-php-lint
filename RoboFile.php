@@ -71,6 +71,11 @@ class RoboFile extends Tasks
     protected $environmentName = '';
 
     /**
+     * @var string
+     */
+    protected $shell = '/bin/bash';
+
+    /**
      * RoboFile constructor.
      */
     public function __construct()
@@ -208,7 +213,7 @@ class RoboFile extends Tasks
         }
 
         $this->composerInfo = json_decode(file_get_contents('composer.json'), true);
-        list($this->packageVendor, $this->packageName) = explode('/', $this->composerInfo['name']);
+        [$this->packageVendor, $this->packageName] = explode('/', $this->composerInfo['name']);
 
         if (!empty($this->composerInfo['config']['bin-dir'])) {
             $this->binDir = $this->composerInfo['config']['bin-dir'];
@@ -353,8 +358,15 @@ class RoboFile extends Tasks
                         '{command}' => $command,
                     ]
                 ));
-                $process = new Process($command, null, null, null, null);
-                $exitCode = $process->run(function ($type, $data) {
+                $process = new Process(
+                    [$this->shell, '-c', $command],
+                    null,
+                    null,
+                    null,
+                    null,
+                );
+
+                return $process->run(function ($type, $data) {
                     switch ($type) {
                         case Process::OUT:
                             $this->output()->write($data);
@@ -365,8 +377,6 @@ class RoboFile extends Tasks
                             break;
                     }
                 });
-
-                return $exitCode;
             });
     }
 
@@ -423,7 +433,11 @@ class RoboFile extends Tasks
 
     protected function isPhpExtensionAvailable(string $extension): bool
     {
-        $command = sprintf('%s -m', escapeshellcmd($this->getPhpExecutable()));
+        $command = [
+            $this->getPhpExecutable(),
+            '-m',
+        ];
+
 
         $process = new Process($command);
         $exitCode = $process->run();
@@ -436,7 +450,10 @@ class RoboFile extends Tasks
 
     protected function isPhpDbgAvailable(): bool
     {
-        $command = sprintf('%s -qrr', escapeshellcmd($this->getPhpdbgExecutable()));
+        $command = [
+            $this->getPhpdbgExecutable(),
+            '-qrr',
+        ];
 
         return (new Process($command))->run() === 0;
     }
@@ -459,11 +476,13 @@ class RoboFile extends Tasks
             $suiteFiles = Finder::create()
                 ->in($this->codeceptionInfo['paths']['tests'])
                 ->files()
+                ->name('*.suite.dist.yml')
                 ->name('*.suite.yml')
                 ->depth(0);
 
             foreach ($suiteFiles as $suiteFile) {
-                $this->codeceptionSuiteNames[] = $suiteFile->getBasename('.suite.yml');
+                $parts = explode('.', $suiteFile->getBasename());
+                $this->codeceptionSuiteNames[] = reset($parts);
             }
         }
 

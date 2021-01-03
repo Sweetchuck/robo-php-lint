@@ -8,7 +8,7 @@ use Codeception\Test\Unit;
 use Robo\Application;
 use Robo\Robo;
 use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
-use Sweetchuck\Robo\PhpLint\Test\Helper\Dummy\DummyProcessHelper;
+use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcessHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 
 abstract class TaskTestBase extends Unit

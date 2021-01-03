@@ -12,6 +12,14 @@ class PhpLintRoboFile extends Tasks
     use PhpLintTaskLoader;
 
     /**
+     * {@inheritdoc}
+     */
+    protected function output()
+    {
+        return $this->getContainer()->get('output');
+    }
+
+    /**
      * @command php-lint:files:default
      *
      * @return \Robo\Contract\TaskInterface

@@ -25,20 +25,20 @@
         "sort-packages": true
     },
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.3",
         "ext-pcre": "*",
         "consolidation/robo": "^2.0",
-        "sweetchuck/utils": "^0.1.0"
+        "sweetchuck/utils": "^1.0"
     },
     "require-dev": {
         "codeception/codeception": "^4.0",
         "codeception/module-asserts": "^1.1",
         "danielstjules/stringy": "^3.0",
         "squizlabs/php_codesniffer": "^3.5",
-        "sweetchuck/codeception-module-robo-task-runner": "^0.7",
-        "sweetchuck/git-hooks": "^0.0",
-        "sweetchuck/robo-git": "^0.2",
-        "sweetchuck/robo-phpcs": "^0.1",
+        "sweetchuck/codeception-module-robo-task-runner": "1.x-dev",
+        "sweetchuck/git-hooks": "2.x-dev",
+        "sweetchuck/robo-git": "1.x-dev",
+        "sweetchuck/robo-phpcs": "1.x-dev",
         "webmozart/path-util": "^2.3"
     },
     "autoload": {
@@ -48,18 +48,11 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Sweetchuck\\Robo\\PhpLint\\Composer\\": "src-dev/Composer/",
             "Sweetchuck\\Robo\\PhpLint\\Test\\Helper\\": "tests/_support/Helper/",
             "Sweetchuck\\Robo\\PhpLint\\Tests\\Acceptance\\": "tests/acceptance/",
             "Sweetchuck\\Robo\\PhpLint\\Tests\\Unit\\": "tests/unit/"
         }
     },
-    "scripts": {
-        "post-install-cmd": [
-            "\\Sweetchuck\\Robo\\PhpLint\\Composer\\Scripts::postInstallCmd"
-        ],
-        "post-update-cmd": [
-            "\\Sweetchuck\\Robo\\PhpLint\\Composer\\Scripts::postUpdateCmd"
-        ]
-    }
+    "scripts": {},
+    "scripts-descriptions": {}
 }
