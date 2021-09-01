@@ -25,12 +25,13 @@
         "sort-packages": true
     },
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.4",
         "ext-pcre": "*",
         "consolidation/robo": "^2.0",
         "sweetchuck/utils": "^1.0"
     },
     "require-dev": {
+        "ext-json": "*",
         "codeception/codeception": "^4.0",
         "codeception/module-asserts": "^1.1",
         "danielstjules/stringy": "^3.0",
