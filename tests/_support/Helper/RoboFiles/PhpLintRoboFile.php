@@ -1,11 +1,14 @@
 <?php
 
-namespace Sweetchuck\Robo\PhpLint\Test\Helper\RoboFiles;
+declare(strict_types = 1);
+
+namespace Sweetchuck\Robo\PhpLint\Tests\Helper\RoboFiles;
 
 use Robo\Tasks;
 use Sweetchuck\Robo\PhpLint\PhpLintTaskLoader;
 use Robo\Contract\TaskInterface;
 use Robo\State\Data as RoboStateData;
+use Symfony\Component\Finder\Finder;
 
 class PhpLintRoboFile extends Tasks
 {
@@ -21,8 +24,6 @@ class PhpLintRoboFile extends Tasks
 
     /**
      * @command php-lint:files:default
-     *
-     * @return \Robo\Contract\TaskInterface
      */
     public function phpLintFilesDefault(
         array $options = [
@@ -38,15 +39,11 @@ class PhpLintRoboFile extends Tasks
             ])
         ));
 
-        return $this
-            ->taskPhpLintFiles($lintOptions)
-            ->setOutput($this->output());
+        return $this->taskPhpLintFiles($lintOptions);
     }
 
     /**
      * @command php-lint:files:custom
-     *
-     * @return \Robo\Contract\TaskInterface
      */
     public function phpLintFilesCustom(
         array $options = [
@@ -55,15 +52,15 @@ class PhpLintRoboFile extends Tasks
         ]
     ): TaskInterface {
         $fileListerCommand = sprintf(
-            'for fileName in %s; do echo -n $fileName"\\0"; done',
-            $options['fileNamePattern']
+            "find ./tests/_data/fixtures -name %s -print0",
+            escapeshellarg($options['fileNamePattern']),
         );
 
         $lintOptions = array_intersect_key(
             $options,
             array_flip([
                 'parallelizer',
-                'fileNamePatterns',
+                'fileNamePattern',
             ])
         );
 
@@ -74,8 +71,6 @@ class PhpLintRoboFile extends Tasks
 
     /**
      * @command php-lint:input:command
-     *
-     * @return \Robo\Contract\TaskInterface
      */
     public function phpLintInputCommand(
         array $options = [
@@ -88,7 +83,7 @@ class PhpLintRoboFile extends Tasks
         $fileNamePattern = $options['fileNamePattern'];
 
         $fileCollectorTask = function (RoboStateData $data) use ($workingDirectory, $fileNamePattern): int {
-            $files = (new \Symfony\Component\Finder\Finder())
+            $files = (new Finder())
                 ->in($workingDirectory)
                 ->name($fileNamePattern);
 

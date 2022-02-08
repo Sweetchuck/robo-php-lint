@@ -8,16 +8,10 @@ use Symfony\Component\Process\Process;
 
 class LintInputTask extends BaseTask
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $taskName = 'PHP Lint input';
+    protected string $taskName = 'PHP Lint input';
 
     // region files
-    /**
-     * @var array
-     */
-    protected $files = [];
+    protected array $files = [];
 
     public function getFiles(): array
     {
@@ -35,10 +29,7 @@ class LintInputTask extends BaseTask
     }
     // endregion
 
-    /**
-     * @var array
-     */
-    protected $currentFile = [];
+    protected array $currentFile = [];
 
     /**
      * {@inheritdoc}
@@ -54,9 +45,6 @@ class LintInputTask extends BaseTask
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildCommand(): array
     {
         $commands = [];

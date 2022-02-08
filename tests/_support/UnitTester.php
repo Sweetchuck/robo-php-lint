@@ -1,6 +1,6 @@
 <?php
 
-namespace Sweetchuck\Robo\PhpLint\Test;
+namespace Sweetchuck\Robo\PhpLint\Tests;
 
 /**
  * Inherited Methods

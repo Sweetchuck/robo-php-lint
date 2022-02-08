@@ -1,23 +1,18 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Sweetchuck\Robo\PhpLint\Task;
 
 use Sweetchuck\Utils\Filter\ArrayFilterEnabled;
 
 class LintFilesTask extends BaseTask
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $taskName = 'PHP Lint files';
+    protected string $taskName = 'PHP Lint files';
 
     // region Options.
-
     // region fileListerCommand
-    /**
-     * @var string
-     */
-    protected $fileListerCommand = '';
+    protected string $fileListerCommand = '';
 
     /**
      * @return string
@@ -63,10 +58,7 @@ class LintFilesTask extends BaseTask
     // endregion
 
     // region parallelizer
-    /**
-     * @var string
-     */
-    protected $parallelizer = 'auto';
+    protected string $parallelizer = 'auto';
 
     public function getParallelizer(): string
     {

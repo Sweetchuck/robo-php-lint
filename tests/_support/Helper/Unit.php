@@ -1,8 +1,11 @@
 <?php
 
-namespace Sweetchuck\Robo\PhpLint\Test\Helper;
+declare(strict_types = 1);
 
-class Unit extends \Codeception\Module
+namespace Sweetchuck\Robo\PhpLint\Tests\Helper;
+
+use Codeception\Module;
+
+class Unit extends Module
 {
-
 }

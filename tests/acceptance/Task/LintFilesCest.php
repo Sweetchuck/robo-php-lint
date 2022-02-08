@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Sweetchuck\Robo\PhpLint\Tests\Acceptance\Task;
 
-use Sweetchuck\Robo\PhpLint\Test\AcceptanceTester;
-use Sweetchuck\Robo\PhpLint\Test\Helper\RoboFiles\PhpLintRoboFile;
+use Sweetchuck\Robo\PhpLint\Tests\AcceptanceTester;
+use Sweetchuck\Robo\PhpLint\Tests\Helper\RoboFiles\PhpLintRoboFile;
 
 class LintFilesCest extends LintCestBase
 {
@@ -142,13 +144,12 @@ class LintFilesCest extends LintCestBase
 
     public function phpLintFilesCustomTrueParallel(AcceptanceTester $I)
     {
-        $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:files:custom:true:parallel';
         $I->runRoboTask(
             $id,
             PhpLintRoboFile::class,
             'php-lint:files:custom',
-            "--fileNamePattern=$fixturesDir/true.*.php"
+            "--fileNamePattern=true.*.php"
         );
         $exitCode = $I->getRoboTaskExitCode($id);
         $stdOutput = $I->getRoboTaskStdOutput($id);
@@ -156,11 +157,11 @@ class LintFilesCest extends LintCestBase
 
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
-        $expectedExitCode = 1;
+        $expectedExitCode = 0;
         $expectedStdOutput = '';
         $expectedStdError = implode(' ', [
             ' [PHP Lint files]',
-            "for fileName in $fixturesDir/true.*.php; do echo -n \$fileName\"\\0\"; done",
+            "find ./tests/_data/fixtures -name 'true.*.php' -print0",
             '|',
             'parallel --null ' . escapeshellarg("php -n $phpDefinitions -l {} 1>/dev/null"),
         ]);
@@ -172,13 +173,12 @@ class LintFilesCest extends LintCestBase
 
     public function phpLintFilesCustomTrueXargs(AcceptanceTester $I)
     {
-        $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:files:custom:true:xargs';
         $I->runRoboTask(
             $id,
             PhpLintRoboFile::class,
             'php-lint:files:custom',
-            "--fileNamePattern=$fixturesDir/true.*.php",
+            "--fileNamePattern=true.*.php",
             '--parallelizer=xargs'
         );
         $exitCode = $I->getRoboTaskExitCode($id);
@@ -187,30 +187,32 @@ class LintFilesCest extends LintCestBase
 
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
-        $expectedExitCode = 123;
-        $expectedStdOutput = '';
+        $expectedExitCode = 0;
+        $expectedStdOutput = implode("\n", [
+            'No syntax errors detected in ./tests/_data/fixtures/true.01.php',
+            'No syntax errors detected in ./tests/_data/fixtures/true.02.php',
+        ]);
         $expectedStdError = implode(' ', [
             ' [PHP Lint files]',
-            "for fileName in $fixturesDir/true.*.php; do echo -n \$fileName\"\\0\"; done",
+            "find ./tests/_data/fixtures -name 'true.*.php' -print0",
             '|',
             'xargs -0 --max-args=1 --max-procs="$(nproc)"',
             "php -n $phpDefinitions -l" . PHP_EOL,
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
-        $I->assertSame($expectedStdOutput, $stdOutput);
+        $I->assertSame($expectedStdOutput, $this->sortLines($stdOutput));
         $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
     public function phpLintFilesCustomFalseParallel(AcceptanceTester $I)
     {
-        $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:files:custom:false:parallel';
         $I->runRoboTask(
             $id,
             PhpLintRoboFile::class,
             'php-lint:files:custom',
-            "--fileNamePattern=$fixturesDir/*.php"
+            "--fileNamePattern=*.php"
         );
         $exitCode = $I->getRoboTaskExitCode($id);
         $stdOutput = $I->getRoboTaskStdOutput($id);
@@ -218,11 +220,11 @@ class LintFilesCest extends LintCestBase
 
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
-        $expectedExitCode = 1;
+        $expectedExitCode = 2;
         $expectedStdOutput = '';
         $expectedStdError = implode(' ', [
             ' [PHP Lint files]',
-            "for fileName in $fixturesDir/*.php; do echo -n \$fileName\"\\0\"; done",
+            "find ./tests/_data/fixtures -name '*.php' -print0",
             '|',
             'parallel --null ' . escapeshellarg("php -n $phpDefinitions -l {} 1>/dev/null"),
         ]);
@@ -234,13 +236,12 @@ class LintFilesCest extends LintCestBase
 
     public function phpLintFilesCustomFalseXargs(AcceptanceTester $I)
     {
-        $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:files:custom:false:xargs';
         $I->runRoboTask(
             $id,
             PhpLintRoboFile::class,
             'php-lint:files:custom',
-            "--fileNamePattern=$fixturesDir/*.php",
+            "--fileNamePattern=*.php",
             '--parallelizer=xargs'
         );
         $exitCode = $I->getRoboTaskExitCode($id);
@@ -249,18 +250,25 @@ class LintFilesCest extends LintCestBase
 
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
-        $expectedExitCode = 123;
-        $expectedStdOutput = '';
+        $expectedExitCode = 124;
+        $expectedStdOutput =[
+            'No syntax errors detected in ./tests/_data/fixtures/true.01.php',
+            'Errors parsing ./tests/_data/fixtures/false.01.php',
+            'No syntax errors detected in ./tests/_data/fixtures/true.02.php',
+            'Errors parsing ./tests/_data/fixtures/false.02.php',
+        ];
         $expectedStdError = implode(' ', [
             ' [PHP Lint files]',
-            "for fileName in $fixturesDir/*.php; do echo -n \$fileName\"\\0\"; done",
+            "find ./tests/_data/fixtures -name '*.php' -print0",
             '|',
             'xargs -0 --max-args=1 --max-procs="$(nproc)"',
             "php -n $phpDefinitions -l" . PHP_EOL,
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
-        $I->assertSame($expectedStdOutput, $stdOutput);
+        foreach ($expectedStdOutput as $expectedLine) {
+            $I->assertStringContainsString($expectedLine, $stdOutput);
+        }
         $I->assertStringContainsString($expectedStdError, $stdError);
     }
 

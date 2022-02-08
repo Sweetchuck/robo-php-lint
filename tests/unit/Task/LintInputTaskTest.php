@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
-use Sweetchuck\Robo\PhpLint\Test\Helper\Dummy\DummyTaskBuilder;
+use Robo\Collection\CollectionBuilder;
+use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
+use Sweetchuck\Robo\PhpLint\Task\BaseTask;
 
 class LintInputTaskTest extends TaskTestBase
 {
 
     /**
-     * {@inheritdoc}
+     * @return \Sweetchuck\Robo\PhpLint\Task\LintInputTask|\Robo\Collection\CollectionBuilder
      */
-    protected function initTask()
+    protected function createTask(): CollectionBuilder
     {
-        $taskBuilder = new DummyTaskBuilder();
-        $taskBuilder->setContainer($this->container);
-
-        $this->task = $taskBuilder->taskPhpLintInput();
-
-        return $this;
+        return $this->taskBuilder->taskPhpLintInput();
     }
 
     public function casesBuildCommand(): array
@@ -89,11 +88,15 @@ class LintInputTaskTest extends TaskTestBase
      */
     public function testBuildCommand(array $expected, array $options = [])
     {
+        $task = $this->createTask();
+        $actual = $task
+            ->setOptions($options)
+            ->buildCommand();
+
         $this->tester->assertSame(
-            $expected,
-            $this->task
-                ->setOptions($options)
-                ->buildCommand()
+            count(DummyProcess::$prophecy),
+            count(DummyProcess::$instances),
         );
+        $this->tester->assertSame($expected, $actual);
     }
 }

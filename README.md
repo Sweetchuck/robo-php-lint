@@ -1,7 +1,7 @@
 
 # Robo task wrapper for `php -l`
 
-[![CircleCI](https://circleci.com/gh/Sweetchuck/robo-php-lint/tree/master.svg?style=svg)](https://circleci.com/gh/Sweetchuck/robo-php-lint/tree/master)
-[![codecov](https://codecov.io/gh/sweetchuck/robo-php-lint/branch/master/graph/badge.svg)](https://codecov.io/gh/sweetchuck/robo-php-lint)
+[![CircleCI](https://circleci.com/gh/Sweetchuck/robo-php-lint/tree/2.x.svg?style=svg)](https://circleci.com/gh/Sweetchuck/robo-php-lint/?branch=2.x)
+[![codecov](https://codecov.io/gh/Sweetchuck/robo-php-lint/branch/2.x/graph/badge.svg?token=HSF16OGPyr)](https://app.codecov.io/gh/Sweetchuck/robo-php-lint/branch/2.x)
 
 @todo

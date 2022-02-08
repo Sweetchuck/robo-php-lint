@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Sweetchuck\Robo\PhpLint\Task;
 
 use League\Container\ContainerAwareInterface;
@@ -19,53 +21,26 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
     use ContainerAwareTrait;
     use OutputAwareTrait;
 
-    /**
-     * @var string
-     */
-    protected $taskName = 'PHP lint';
+    protected string $taskName = 'PHP lint';
 
-    /**
-     * @var string
-     */
-    protected $shell = 'bash';
+    protected string $shell = 'bash';
 
-    /**
-     * @var string
-     */
-    protected $command = '';
+    protected string $command = '';
 
-    /**
-     * @var int
-     */
-    protected $processExitCode = 0;
+    protected int $processExitCode = 0;
 
-    /**
-     * @var string
-     */
-    protected $processStdOutput = '';
+    protected string $processStdOutput = '';
 
-    /**
-     * @var string
-     */
-    protected $processStdError = '';
+    protected string $processStdError = '';
 
-    /**
-     * @var null|\Closure
-     */
-    protected $processRunCallbackWrapper;
+    protected ?\Closure $processRunCallbackWrapper;
 
-    /**
-     * @var array
-     */
-    protected $assets = [];
+    protected array $assets = [];
 
     // region Options
 
     // region Option - workingDirectory.
-    /**
-     * @var string
-     */
-    protected $workingDirectory = '';
+    protected string $workingDirectory = '';
 
     public function getWorkingDirectory(): string
     {
@@ -84,10 +59,7 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
     // endregion
 
     // region Option - phpExecutable.
-    /**
-     * @var string
-     */
-    protected $phpExecutable = 'php';
+    protected string $phpExecutable = 'php';
 
     public function getPhpExecutable(): string
     {
@@ -106,10 +78,7 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
     // endregion
 
     // region Option - assetNamePrefix.
-    /**
-     * @var string
-     */
-    protected $assetNamePrefix = '';
+    protected string $assetNamePrefix = '';
 
     public function getAssetNamePrefix(): string
     {
@@ -126,7 +95,6 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this;
     }
     // endregion
-
     // endregion
 
     public function __construct()

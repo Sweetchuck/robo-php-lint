@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Sweetchuck\Robo\PhpLint\Tests\Acceptance\Task;
 
-use Sweetchuck\Robo\PhpLint\Test\AcceptanceTester;
-use Sweetchuck\Robo\PhpLint\Test\Helper\RoboFiles\PhpLintRoboFile;
+use Sweetchuck\Robo\PhpLint\Tests\AcceptanceTester;
+use Sweetchuck\Robo\PhpLint\Tests\Helper\RoboFiles\PhpLintRoboFile;
 
 class LintInputCest extends LintCestBase
 {
@@ -26,29 +28,17 @@ class LintInputCest extends LintCestBase
 
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
-        $cmdPattern = "cat 'tests/_data/fixtures/true.%02d.php' | php -n $phpDefinitions -l 1>/dev/null";
-
         $expectedExitCode = 0;
         $expectedStdOutput = '';
-        $expectedStdErrorStartsWith = ' [PHP Lint input] 2 files' . PHP_EOL;
-        $expectedStdErrorContains = [
-            implode(PHP_EOL, [
-                "  RUN  'bash' '-c' " . escapeshellarg(sprintf($cmdPattern, 1)),
-                '  RES  Command ran successfully',
-                '',
-            ]),
-            implode(PHP_EOL, [
-                "  RUN  'bash' '-c' " . escapeshellarg(sprintf($cmdPattern, 2)),
-                '  RES  Command ran successfully',
-                '',
-            ]),
+        $expectedStdError = [
+            ' [PHP Lint input] 2 files' . PHP_EOL,
+            '  RES  Command ran successfully',
         ];
 
         $I->assertSame($expectedExitCode, $exitCode);
         $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertStringStartsWith($expectedStdErrorStartsWith, $stdError);
-        foreach ($expectedStdErrorContains as $expectedFragment) {
-            $I->assertStringContainsString($expectedFragment, $stdError);
+        foreach ($expectedStdError as $expectedLine) {
+            $I->assertStringContainsString($expectedLine, $stdError);
         }
     }
 
@@ -71,24 +61,16 @@ class LintInputCest extends LintCestBase
 
         $expectedExitCode = 255;
         $expectedStdOutput = '';
-        $expectedStdErrorStartsWith = ' [PHP Lint input] 2 files' . PHP_EOL;
-        $expectedStdErrorContains = [
+        $expectedStdError = [
+            ' [PHP Lint input] 2 files' . PHP_EOL,
             sprintf($pattern, 'false.01.php', 11),
             sprintf($pattern, 'false.02.php', 11),
         ];
-        $expectedStdErrorEndsWith = implode(PHP_EOL, [
-            ' ',
-            ' [Sweetchuck\Robo\PhpLint\Task\LintInputTask]   ',
-            ' [Sweetchuck\Robo\PhpLint\Task\LintInputTask]  Exit code 255 ',
-            '',
-        ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
         $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertStringStartsWith($expectedStdErrorStartsWith, $stdError);
-        foreach ($expectedStdErrorContains as $expectedFragment) {
-            $I->assertStringContainsString($expectedFragment, $stdError);
+        foreach ($expectedStdError as $expectedLine) {
+            $I->assertStringContainsString($expectedLine, $stdError);
         }
-        $I->assertStringEndsWith($expectedStdErrorEndsWith, $stdError);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Sweetchuck\Robo\PhpLint\Tests\Acceptance\Task;
+declare(strict_types = 1);
 
-use Webmozart\PathUtil\Path;
+namespace Sweetchuck\Robo\PhpLint\Tests\Acceptance\Task;
 
 class LintCestBase
 {
@@ -20,6 +20,6 @@ class LintCestBase
 
     protected function getFixturesDir(): string
     {
-        return Path::makeRelative(codecept_data_dir('fixtures'), getcwd());
+        return './tests/_data/fixtures';
     }
 }

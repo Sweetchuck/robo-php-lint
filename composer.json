@@ -21,13 +21,19 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
-        "bin-dir": "bin",
+        "allow-plugins": {
+            "sweetchuck/git-hooks": true
+        },
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        },
         "sort-packages": true
     },
     "require": {
         "php": ">=7.4",
         "ext-pcre": "*",
-        "consolidation/robo": "^2.0",
+        "consolidation/robo": "^3.0",
         "sweetchuck/utils": "^1.0"
     },
     "require-dev": {
@@ -35,11 +41,12 @@
         "codeception/codeception": "^4.0",
         "codeception/module-asserts": "^1.1",
         "danielstjules/stringy": "^3.0",
+        "nuvoleweb/robo-config": "2.x-dev",
         "squizlabs/php_codesniffer": "^3.5",
-        "sweetchuck/codeception-module-robo-task-runner": "1.x-dev",
+        "sweetchuck/codeception-module-robo-task-runner": "2.x-dev",
         "sweetchuck/git-hooks": "2.x-dev",
-        "sweetchuck/robo-git": "1.x-dev",
-        "sweetchuck/robo-phpcs": "1.x-dev",
+        "sweetchuck/robo-git": "2.x-dev",
+        "sweetchuck/robo-phpcs": "2.x-dev",
         "webmozart/path-util": "^2.3"
     },
     "autoload": {
@@ -49,9 +56,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Sweetchuck\\Robo\\PhpLint\\Test\\Helper\\": "tests/_support/Helper/",
             "Sweetchuck\\Robo\\PhpLint\\Tests\\Acceptance\\": "tests/acceptance/",
-            "Sweetchuck\\Robo\\PhpLint\\Tests\\Unit\\": "tests/unit/"
+            "Sweetchuck\\Robo\\PhpLint\\Tests\\Unit\\": "tests/unit/",
+            "Sweetchuck\\Robo\\PhpLint\\Tests\\": "tests/_support/"
         }
     },
     "scripts": {},
