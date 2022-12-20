@@ -19,33 +19,40 @@ executors:
         environment:
             <<: *env_app
             <<: *env_composer
-
         docker:
             -
                 name: 'main'
-                image: 'circleci/php:7.4'
+                image: 'cimg/php:7.4'
 
     php_plus1:
         resource_class: 'small'
         environment:
             <<: *env_app
             <<: *env_composer
-
         docker:
             -
                 name: 'main'
-                image: 'circleci/php:8.0'
+                image: 'cimg/php:8.0'
 
     php_plus2:
         resource_class: 'small'
         environment:
             <<: *env_app
             <<: *env_composer
-
         docker:
             -
                 name: 'main'
                 image: 'cimg/php:8.1'
+
+    php_plus3:
+        resource_class: 'small'
+        environment:
+            <<: *env_app
+            <<: *env_composer
+        docker:
+            -
+                name: 'main'
+                image: 'cimg/php:8.2'
 
 commands:
     install_php_extension_pcov:
@@ -96,7 +103,7 @@ commands:
                 run:
                     name: 'Run linters'
                     command: |
-                        "$(composer config bin-dir)/robo" lint
+                        "$(composer config bin-dir)/robo" --ansi lint
 
     test:
         description: 'Run tests'
@@ -105,7 +112,7 @@ commands:
                 run:
                     name: 'Codeception - unit'
                     command: |
-                        "$(composer config bin-dir)/robo" test unit
+                        "$(composer config bin-dir)/robo" --ansi test unit
             -
                 codecov/upload:
                     flags: 'unit'
@@ -114,7 +121,7 @@ commands:
                 run:
                     name: 'Codeception - acceptance'
                     command: |
-                          "$(composer config bin-dir)/robo" test acceptance
+                          "$(composer config bin-dir)/robo" --ansi test acceptance
             -
                 codecov/upload:
                     flags: 'acceptance'
@@ -127,36 +134,20 @@ commands:
 jobs:
     build:
         executor: 'php_min'
-        working_directory: '~/repo'
         steps:
             - 'checkout'
             - 'composer_install'
     lint:
         executor: 'php_min'
-        working_directory: '~/repo'
         steps:
             - 'checkout'
             - 'composer_install'
             - 'lint'
-    test_php_min:
-        executor: 'php_min'
-        working_directory: '~/repo'
-        steps:
-            - 'checkout'
-            - 'install_php_extension_pcov'
-            - 'composer_install'
-            - 'test'
-    test_php_plus1:
-        executor: 'php_plus1'
-        working_directory: '~/repo'
-        steps:
-            - 'checkout'
-            - 'install_php_extension_pcov'
-            - 'composer_install'
-            - 'test'
-    test_php_plus2:
-        executor: 'php_plus2'
-        working_directory: '~/repo'
+    test:
+        parameters:
+            executor:
+                type: 'string'
+        executor: '<<parameters.executor>>'
         steps:
             - 'checkout'
             - 'install_php_extension_pcov'
@@ -173,14 +164,14 @@ workflows:
                     requires:
                         - 'build'
             -
-                test_php_min:
+                test:
+                    name: 'test_<<matrix.executor>>'
                     requires:
                         - 'build'
-            -
-                test_php_plus1:
-                    requires:
-                        - 'build'
-            -
-                test_php_plus2:
-                    requires:
-                        - 'build'
+                    matrix:
+                        parameters:
+                            executor:
+                                - 'php_min'
+                                - 'php_plus1'
+                                - 'php_plus2'
+                                - 'php_plus3'
