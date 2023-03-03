@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Robo\PhpLint\Task;
 
+use Consolidation\AnnotatedCommand\Output\OutputAwareInterface;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use Robo\Common\OutputAwareTrait;
 use Robo\Contract\CommandInterface;
-use Robo\Contract\OutputAwareInterface;
 use Robo\Result;
 use Robo\Task\BaseTask as RoboBaseTask;
 use Robo\TaskInfo;
@@ -47,10 +47,7 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this->workingDirectory;
     }
 
-    /**
-     * @return $this
-     */
-    public function setWorkingDirectory(string $value)
+    public function setWorkingDirectory(string $value): static
     {
         $this->workingDirectory = $value;
 
@@ -66,10 +63,7 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this->phpExecutable;
     }
 
-    /**
-     * @return $this
-     */
-    public function setPhpExecutable(string $value)
+    public function setPhpExecutable(string $value): static
     {
         $this->phpExecutable = $value;
 
@@ -85,10 +79,7 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this->assetNamePrefix;
     }
 
-    /**
-     * @return $this
-     */
-    public function setAssetNamePrefix(string $value)
+    public function setAssetNamePrefix(string $value): static
     {
         $this->assetNamePrefix = $value;
 
@@ -102,10 +93,7 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         $this->initProcessRunCallbackWrapper();
     }
 
-    /**
-     * @return $this
-     */
-    protected function initProcessRunCallbackWrapper()
+    protected function initProcessRunCallbackWrapper(): static
     {
         $this->processRunCallbackWrapper = function ($type, $data) {
             $this->processRunCallback($type, $data);
@@ -114,10 +102,7 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         if (array_key_exists('workingDirectory', $options)) {
             $this->setWorkingDirectory($options['workingDirectory']);
@@ -160,28 +145,19 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
             ->runReturn();
     }
 
-    /**
-     * @return $this
-     */
-    protected function runInit()
+    protected function runInit(): static
     {
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    protected function runHeader()
+    protected function runHeader(): static
     {
         $this->printTaskInfo($this->command);
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    protected function runDoIt()
+    protected function runDoIt(): static
     {
         $processHelper = $this->getProcessHelper();
         $process = $processHelper->run(
@@ -202,20 +178,14 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    protected function runInitAssets()
+    protected function runInitAssets(): static
     {
         $this->assets = [];
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    protected function runProcessOutputs()
+    protected function runProcessOutputs(): static
     {
         return $this;
     }

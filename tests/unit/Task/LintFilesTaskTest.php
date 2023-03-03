@@ -4,19 +4,25 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
-use Robo\Collection\CollectionBuilder;
+use Codeception\Attribute\DataProvider;
 use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
 use Sweetchuck\Robo\PhpLint\Task\BaseTask;
+use Sweetchuck\Robo\PhpLint\Task\LintFilesTask;
 
+/**
+ * @covers \Sweetchuck\Robo\PhpLint\Task\LintFilesTask
+ * @covers \Sweetchuck\Robo\PhpLint\Task\BaseTask
+ * @covers \Sweetchuck\Robo\PhpLint\PhpLintTaskLoader
+ */
 class LintFilesTaskTest extends TaskTestBase
 {
 
     /**
-     * @return \Sweetchuck\Robo\PhpLint\Task\LintFilesTask|\Robo\Collection\CollectionBuilder
+     * @return \Sweetchuck\Robo\PhpLint\Task\LintFilesTask
      */
-    protected function createTask(): CollectionBuilder
+    protected function createTaskInstance(): BaseTask
     {
-        return $this->taskBuilder->taskPhpLintFiles();
+        return new LintFilesTask();
     }
 
     public function casesBuildCommand(): array
@@ -55,19 +61,19 @@ class LintFilesTaskTest extends TaskTestBase
         ];
 
         return [
-            //'default auto parallel' => [
-            //    [
-            //        $listFilesCommandDefault,
-            //        '|',
-            //        $parallelCommandDefault,
-            //        $defaultPhpCommandParallel,
-            //    ],
-            //    [],
-            //    [
-            //        $exitCode0,
-            //        $exitCode0,
-            //    ],
-            //],
+            'default auto parallel' => [
+                [
+                    $listFilesCommandDefault,
+                    '|',
+                    $parallelCommandDefault,
+                    $defaultPhpCommandParallel,
+                ],
+                [],
+                [
+                    $exitCode0,
+                    $exitCode0,
+                ],
+            ],
             'default auto xargs' => [
                 [
                     $listFilesCommandDefault,
@@ -83,62 +89,60 @@ class LintFilesTaskTest extends TaskTestBase
                     $exitCode0,
                 ],
             ],
-            //'default parallel' => [
-            //    [
-            //        $listFilesCommandDefault,
-            //        '|',
-            //        $parallelCommandDefault,
-            //        $defaultPhpCommandParallel,
-            //    ],
-            //    [
-            //        'parallelizer' => 'parallel',
-            //    ],
-            //],
-            //'default xargs' => [
-            //    [
-            //        $listFilesCommandDefault,
-            //        '|',
-            //        $xargsCommandDefault,
-            //        $defaultPhpCommand,
-            //    ],
-            //    [
-            //        'parallelizer' => 'xargs',
-            //    ],
-            //],
-            //'default fileNamePatterns' => [
-            //    [
-            //        $listFilesCommandFileNamePatterns,
-            //        '|',
-            //        $parallelCommandDefault,
-            //        $defaultPhpCommandParallel,
-            //    ],
-            //    [
-            //        'parallelizer' => 'parallel',
-            //        'fileNamePatterns' => [
-            //            '*.php' => true,
-            //            '*.module' => true,
-            //            '*.install' => true,
-            //        ],
-            //    ],
-            //],
-            //'fileListerCommand string' => [
-            //    [
-            //        'cat files.txt',
-            //        '|',
-            //        $parallelCommandDefault,
-            //        $defaultPhpCommandParallel,
-            //    ],
-            //    [
-            //        'parallelizer' => 'parallel',
-            //        'fileListerCommand' => 'cat files.txt',
-            //    ],
-            //],
+            'default parallel' => [
+                [
+                    $listFilesCommandDefault,
+                    '|',
+                    $parallelCommandDefault,
+                    $defaultPhpCommandParallel,
+                ],
+                [
+                    'parallelizer' => 'parallel',
+                ],
+            ],
+            'default xargs' => [
+                [
+                    $listFilesCommandDefault,
+                    '|',
+                    $xargsCommandDefault,
+                    $defaultPhpCommand,
+                ],
+                [
+                    'parallelizer' => 'xargs',
+                ],
+            ],
+            'default fileNamePatterns' => [
+                [
+                    $listFilesCommandFileNamePatterns,
+                    '|',
+                    $parallelCommandDefault,
+                    $defaultPhpCommandParallel,
+                ],
+                [
+                    'parallelizer' => 'parallel',
+                    'fileNamePatterns' => [
+                        '*.php' => true,
+                        '*.module' => true,
+                        '*.install' => true,
+                    ],
+                ],
+            ],
+            'fileListerCommand string' => [
+                [
+                    'cat files.txt',
+                    '|',
+                    $parallelCommandDefault,
+                    $defaultPhpCommandParallel,
+                ],
+                [
+                    'parallelizer' => 'parallel',
+                    'fileListerCommand' => 'cat files.txt',
+                ],
+            ],
         ];
     }
 
-    /**
-     * @dataProvider casesBuildCommand
-     */
+    #[DataProvider('casesBuildCommand')]
     public function testBuildCommand(array $expected, array $options = [], array $processResults = [])
     {
         foreach ($processResults as $processResult) {
@@ -147,14 +151,9 @@ class LintFilesTaskTest extends TaskTestBase
 
         $task = $this->createTask();
 
-        $actual = $task
-            ->setOptions($options)
-            ->buildCommand();
-
         $this->tester->assertSame(
-            count(DummyProcess::$prophecy),
-            count(DummyProcess::$instances),
+            $expected,
+            $task->setOptions($options)->buildCommand(),
         );
-        $this->tester->assertSame($expected, $actual);
     }
 }

@@ -4,19 +4,24 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
-use Robo\Collection\CollectionBuilder;
-use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
+use Codeception\Attribute\DataProvider;
 use Sweetchuck\Robo\PhpLint\Task\BaseTask;
+use Sweetchuck\Robo\PhpLint\Task\LintInputTask;
 
+/**
+ * @covers \Sweetchuck\Robo\PhpLint\Task\LintInputTask
+ * @covers \Sweetchuck\Robo\PhpLint\Task\BaseTask
+ * @covers \Sweetchuck\Robo\PhpLint\PhpLintTaskLoader
+ */
 class LintInputTaskTest extends TaskTestBase
 {
 
     /**
-     * @return \Sweetchuck\Robo\PhpLint\Task\LintInputTask|\Robo\Collection\CollectionBuilder
+     * @return \Sweetchuck\Robo\PhpLint\Task\LintInputTask
      */
-    protected function createTask(): CollectionBuilder
+    protected function createTaskInstance(): BaseTask
     {
-        return $this->taskBuilder->taskPhpLintInput();
+        return new LintInputTask();
     }
 
     public function casesBuildCommand(): array
@@ -83,20 +88,13 @@ class LintInputTaskTest extends TaskTestBase
         ];
     }
 
-    /**
-     * @dataProvider casesBuildCommand
-     */
-    public function testBuildCommand(array $expected, array $options = [])
+    #[DataProvider('casesBuildCommand')]
+    public function testBuildCommand(array $expected, array $options = []): void
     {
         $task = $this->createTask();
-        $actual = $task
-            ->setOptions($options)
-            ->buildCommand();
-
         $this->tester->assertSame(
-            count(DummyProcess::$prophecy),
-            count(DummyProcess::$instances),
+            $expected,
+            $task->setOptions($options)->buildCommand(),
         );
-        $this->tester->assertSame($expected, $actual);
     }
 }

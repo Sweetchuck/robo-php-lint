@@ -18,10 +18,7 @@ class LintInputTask extends BaseTask
         return $this->files;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFiles(array $files)
+    public function setFiles(array $files): static
     {
         $this->files = $files;
 
@@ -31,10 +28,7 @@ class LintInputTask extends BaseTask
 
     protected array $currentFile = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         parent::setOptions($options);
 
@@ -57,7 +51,7 @@ class LintInputTask extends BaseTask
         return $commands;
     }
 
-    protected function runHeader()
+    protected function runHeader(): static
     {
         $this->printTaskInfo(
             '{count} files',
@@ -69,10 +63,7 @@ class LintInputTask extends BaseTask
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function runDoIt()
+    protected function runDoIt(): static
     {
         $output = $this->output();
         $processHelper = $this->getProcessHelper();
@@ -110,9 +101,6 @@ class LintInputTask extends BaseTask
         );
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function getPhpCommand(): string
     {
         return parent::getPhpCommand() . ' 1>/dev/null';

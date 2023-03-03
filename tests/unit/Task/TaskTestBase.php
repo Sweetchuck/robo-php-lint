@@ -14,8 +14,11 @@ use Robo\Robo;
 use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyOutput;
 use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
 use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcessHelper;
+use Sweetchuck\Robo\PhpLint\Task\BaseTask;
+use Sweetchuck\Robo\PhpLint\Task\LintFilesTask;
 use Sweetchuck\Robo\PhpLint\Tests\Helper\Dummy\DummyTaskBuilder;
 use Sweetchuck\Robo\PhpLint\Tests\UnitTester;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 
 abstract class TaskTestBase extends Unit
 {
@@ -58,5 +61,28 @@ abstract class TaskTestBase extends Unit
     /**
      * @return \Sweetchuck\Robo\PhpLint\Task\BaseTask|\Robo\Collection\CollectionBuilder
      */
-    abstract protected function createTask(): CollectionBuilder;
+    protected function createTask()
+    {
+        $container = new LeagueContainer();
+        $application = new Application('Sweetchuck - Robo PHPLint', '1.0.0');
+        $application->getHelperSet()->set(new DummyProcessHelper(), 'process');
+        $config = new Config();
+        $output = new DummyOutput([]);
+        $loggerOutput = new DummyOutput([]);
+        $logger = new ConsoleLogger($loggerOutput);
+
+        $container->add('output', $output);
+        $container->add('logger', $logger);
+        $container->add('config', $config);
+        $container->add('application', $application);
+
+        $task = $this->createTaskInstance();
+        $task->setContainer($container);
+        $task->setOutput($output);
+        $task->setLogger($logger);
+
+        return $task;
+    }
+
+    abstract protected function createTaskInstance(): BaseTask;
 }

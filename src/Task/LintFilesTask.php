@@ -24,10 +24,8 @@ class LintFilesTask extends BaseTask
 
     /**
      * @param string $value
-     *
-     * @return $this
      */
-    public function setFileListerCommand(string $value)
+    public function setFileListerCommand(string $value): static
     {
         $this->fileListerCommand = $value;
 
@@ -36,20 +34,14 @@ class LintFilesTask extends BaseTask
     // endregion
 
     // region fileNamePatterns
-    /**
-     * @var array
-     */
-    protected $fileNamePatterns = [];
+    protected array $fileNamePatterns = [];
 
     public function getFileNamePatterns(): array
     {
         return $this->fileNamePatterns;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFileNamePatterns(array $value)
+    public function setFileNamePatterns(array $value): static
     {
         $this->fileNamePatterns = $value;
 
@@ -70,10 +62,8 @@ class LintFilesTask extends BaseTask
      *   - parallel: Uses "parallel" to run commands parallel.
      *   - xargs: Uses "xargs" to run commands parallel.
      *   - auto: Tries to detect existence of "parallel" first, then "xargs".
-     *
-     * @return $this
      */
-    public function setParallelizer(string $value)
+    public function setParallelizer(string $value): static
     {
         $this->parallelizer = $value;
 
@@ -83,10 +73,7 @@ class LintFilesTask extends BaseTask
 
     // endregion
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         parent::setOptions($options);
 
@@ -128,9 +115,6 @@ class LintFilesTask extends BaseTask
         return [];
     }
 
-  /**
-   * @return string
-   */
     protected function getDefaultFileListerCommand(): string
     {
         $cmd = [];
@@ -177,17 +161,11 @@ class LintFilesTask extends BaseTask
         return null;
     }
 
-    /**
-     * @return string[]
-     */
     protected function getParallelizerCommandParallel(): string
     {
         return 'parallel --null';
     }
 
-    /**
-     * @return string
-     */
     protected function getParallelizerCommandXargs(): string
     {
         return 'xargs -0 --max-args=1 --max-procs="$(nproc)"';

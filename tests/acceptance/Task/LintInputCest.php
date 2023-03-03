@@ -9,7 +9,7 @@ use Sweetchuck\Robo\PhpLint\Tests\Helper\RoboFiles\PhpLintRoboFile;
 
 class LintInputCest extends LintCestBase
 {
-    public function phpLintInputCommandTrue(AcceptanceTester $I)
+    public function phpLintInputCommandTrue(AcceptanceTester $I): void
     {
         $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:input:command:true';
@@ -42,7 +42,7 @@ class LintInputCest extends LintCestBase
         }
     }
 
-    public function phpLintInputCommandFalse(AcceptanceTester $I)
+    public function phpLintInputCommandFalse(AcceptanceTester $I): void
     {
         $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:input:command:false';

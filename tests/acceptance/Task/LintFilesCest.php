@@ -9,7 +9,7 @@ use Sweetchuck\Robo\PhpLint\Tests\Helper\RoboFiles\PhpLintRoboFile;
 
 class LintFilesCest extends LintCestBase
 {
-    public function phpLintFilesDefaultTrueParallel(AcceptanceTester $I)
+    public function phpLintFilesDefaultTrueParallel(AcceptanceTester $I): void
     {
         $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:files:default:true:parallel';
@@ -39,7 +39,7 @@ class LintFilesCest extends LintCestBase
         $I->assertSame(0, $exitCode, 'exitCode');
     }
 
-    public function phpLintFilesDefaultTrueXargs(AcceptanceTester $I)
+    public function phpLintFilesDefaultTrueXargs(AcceptanceTester $I): void
     {
         $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:files:default:true:xargs';
@@ -74,7 +74,7 @@ class LintFilesCest extends LintCestBase
         $I->assertSame(0, $exitCode);
     }
 
-    public function phpLintFilesDefaultFalseParallel(AcceptanceTester $I)
+    public function phpLintFilesDefaultFalseParallel(AcceptanceTester $I): void
     {
         $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:files:default:false:parallel';
@@ -104,7 +104,7 @@ class LintFilesCest extends LintCestBase
         $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
-    public function phpLintFilesDefaultFalseXargs(AcceptanceTester $I)
+    public function phpLintFilesDefaultFalseXargs(AcceptanceTester $I): void
     {
         $fixturesDir = $this->getFixturesDir();
         $id = 'php-lint:files:default:false:xargs';
@@ -142,7 +142,7 @@ class LintFilesCest extends LintCestBase
         $I->assertStringStartsWith($expectedStdError, $stdError);
     }
 
-    public function phpLintFilesCustomTrueParallel(AcceptanceTester $I)
+    public function phpLintFilesCustomTrueParallel(AcceptanceTester $I): void
     {
         $id = 'php-lint:files:custom:true:parallel';
         $I->runRoboTask(
@@ -171,7 +171,7 @@ class LintFilesCest extends LintCestBase
         $I->assertStringContainsString($expectedStdError, $stdError, 'stdError');
     }
 
-    public function phpLintFilesCustomTrueXargs(AcceptanceTester $I)
+    public function phpLintFilesCustomTrueXargs(AcceptanceTester $I): void
     {
         $id = 'php-lint:files:custom:true:xargs';
         $I->runRoboTask(
@@ -205,7 +205,7 @@ class LintFilesCest extends LintCestBase
         $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
-    public function phpLintFilesCustomFalseParallel(AcceptanceTester $I)
+    public function phpLintFilesCustomFalseParallel(AcceptanceTester $I): void
     {
         $id = 'php-lint:files:custom:false:parallel';
         $I->runRoboTask(
@@ -234,7 +234,7 @@ class LintFilesCest extends LintCestBase
         $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
-    public function phpLintFilesCustomFalseXargs(AcceptanceTester $I)
+    public function phpLintFilesCustomFalseXargs(AcceptanceTester $I): void
     {
         $id = 'php-lint:files:custom:false:xargs';
         $I->runRoboTask(
