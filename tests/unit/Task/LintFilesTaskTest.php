@@ -123,6 +123,7 @@ class LintFilesTaskTest extends TaskTestBase
                     'fileNamePatterns' => [
                         '*.php' => true,
                         '*.module' => true,
+                        '*.ignore' => false,
                         '*.install' => true,
                     ],
                 ],
