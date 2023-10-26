@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Robo\PhpLint\Task;
 
-use Sweetchuck\Utils\Filter\ArrayFilterEnabled;
-
 class LintFilesTask extends BaseTask
 {
     protected string $taskName = 'PHP Lint files';
@@ -133,7 +131,7 @@ class LintFilesTask extends BaseTask
 
         $fileNamePatterns = $this->getFileNamePatterns();
         if (gettype(reset($fileNamePatterns)) === 'boolean') {
-            $fileNamePatterns = array_keys(array_filter($fileNamePatterns, new ArrayFilterEnabled()));
+            $fileNamePatterns = array_keys(array_filter($fileNamePatterns));
         }
 
         if (!$fileNamePatterns) {
