@@ -251,12 +251,12 @@ class LintFilesCest extends LintCestBase
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
         $expectedExitCode = 124;
-        $expectedStdOutput =[
-            'No syntax errors detected in ./tests/_data/fixtures/true.01.php',
+        $expectedStdOutput = implode(\PHP_EOL, [
             'Errors parsing ./tests/_data/fixtures/false.01.php',
-            'No syntax errors detected in ./tests/_data/fixtures/true.02.php',
             'Errors parsing ./tests/_data/fixtures/false.02.php',
-        ];
+            'No syntax errors detected in ./tests/_data/fixtures/true.01.php',
+            'No syntax errors detected in ./tests/_data/fixtures/true.02.php',
+        ]);
         $expectedStdError = implode(' ', [
             ' [PHP Lint files]',
             "find ./tests/_data/fixtures -name '*.php' -print0",
@@ -266,9 +266,7 @@ class LintFilesCest extends LintCestBase
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
-        foreach ($expectedStdOutput as $expectedLine) {
-            $I->assertStringContainsString($expectedLine, $stdOutput);
-        }
+        $I->assertSame($expectedStdOutput, $this->sortLines($stdOutput));
         $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
