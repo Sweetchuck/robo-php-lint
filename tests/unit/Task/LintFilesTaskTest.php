@@ -5,15 +5,17 @@ declare(strict_types = 1);
 namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
 use Codeception\Attribute\DataProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
+use Sweetchuck\Robo\PhpLint\Parallelizer;
+use Sweetchuck\Robo\PhpLint\PhpLintTaskLoader;
 use Sweetchuck\Robo\PhpLint\Task\BaseTask;
 use Sweetchuck\Robo\PhpLint\Task\LintFilesTask;
 
-/**
- * @covers \Sweetchuck\Robo\PhpLint\Task\LintFilesTask
- * @covers \Sweetchuck\Robo\PhpLint\Task\BaseTask
- * @covers \Sweetchuck\Robo\PhpLint\PhpLintTaskLoader
- */
+#[CoversClass(LintFilesTask::class)]
+#[CoversClass(BaseTask::class)]
+#[CoversTrait(PhpLintTaskLoader::class)]
 class LintFilesTaskTest extends TaskTestBase
 {
 
@@ -25,7 +27,10 @@ class LintFilesTaskTest extends TaskTestBase
         return new LintFilesTask();
     }
 
-    public function casesBuildCommand(): array
+    /**
+     * @return array<string, mixed>
+     */
+    public static function casesBuildCommand(): array
     {
         $listFilesCommandDefault = "git ls-files -z -- '*.php'";
         $listFilesCommandFileNamePatterns = "git ls-files -z -- '*.php' '*.module' '*.install'";
@@ -97,7 +102,7 @@ class LintFilesTaskTest extends TaskTestBase
                     $defaultPhpCommandParallel,
                 ],
                 [
-                    'parallelizer' => 'parallel',
+                    'parallelizer' => Parallelizer::Parallel,
                 ],
             ],
             'default xargs' => [
@@ -108,7 +113,7 @@ class LintFilesTaskTest extends TaskTestBase
                     $defaultPhpCommand,
                 ],
                 [
-                    'parallelizer' => 'xargs',
+                    'parallelizer' => Parallelizer::Xargs,
                 ],
             ],
             'default fileNamePatterns' => [
@@ -119,7 +124,7 @@ class LintFilesTaskTest extends TaskTestBase
                     $defaultPhpCommandParallel,
                 ],
                 [
-                    'parallelizer' => 'parallel',
+                    'parallelizer' => Parallelizer::Parallel,
                     'fileNamePatterns' => [
                         '*.php' => true,
                         '*.module' => true,
@@ -136,16 +141,24 @@ class LintFilesTaskTest extends TaskTestBase
                     $defaultPhpCommandParallel,
                 ],
                 [
-                    'parallelizer' => 'parallel',
+                    'parallelizer' => Parallelizer::Parallel,
                     'fileListerCommand' => 'cat files.txt',
                 ],
             ],
         ];
     }
 
+    /**
+     * @param array<string> $expected
+     * @param array<string, mixed> $options
+     * @phpstan-param array<robo-php-lint-process-result> $processResults
+     */
     #[DataProvider('casesBuildCommand')]
-    public function testBuildCommand(array $expected, array $options = [], array $processResults = [])
-    {
+    public function testBuildCommand(
+        array $expected,
+        array $options = [],
+        array $processResults = [],
+    ): void {
         foreach ($processResults as $processResult) {
             DummyProcess::$prophecy[] = $processResult;
         }
@@ -154,6 +167,7 @@ class LintFilesTaskTest extends TaskTestBase
 
         $this->tester->assertSame(
             $expected,
+            // @phpstan-ignore method.notFound
             $task->setOptions($options)->buildCommand(),
         );
     }

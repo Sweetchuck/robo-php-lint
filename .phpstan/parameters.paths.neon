@@ -1,0 +1,11 @@
+parameters:
+	paths:
+		- ../src/
+		- ../tests/
+		- ../RoboFile.php
+	excludePaths:
+		analyse:
+		- ../tests/_support/_generated/
+		analyseAndScan:
+		- ../tests/_data/
+		- ../tests/_output/

@@ -35,6 +35,9 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
 
     protected ?\Closure $processRunCallbackWrapper;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $assets = [];
 
     // region Options
@@ -102,6 +105,9 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this;
     }
 
+    /**
+     * @phpstan-param robo-php-lint-task-lint-base-options $options
+     */
     public function setOptions(array $options): static
     {
         if (array_key_exists('workingDirectory', $options)) {
@@ -127,6 +133,9 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return implode(' ', $this->buildCommand());
     }
 
+    /**
+     * @return array<string>
+     */
     abstract public function buildCommand(): array;
 
     /**
@@ -223,6 +232,9 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this->processStdError;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getAssetsWithPrefixedNames(): array
     {
         $prefix = $this->getAssetNamePrefix();
@@ -243,9 +255,6 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return $this->taskName ?: TaskInfo::formatTaskName($this);
     }
 
-    /**
-     * @return string[]
-     */
     protected function getPhpCommand(): string
     {
         $cmd = [
@@ -263,6 +272,9 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
         return implode(' ', $cmd);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function getPhpIniDefinitions(): array
     {
         return [
@@ -277,6 +289,10 @@ abstract class BaseTask extends RoboBaseTask implements CommandInterface, Contai
 
     /**
      * {@inheritdoc}
+     *
+     * @param ?array<string, mixed> $context
+     *
+     * @return array<string, mixed>
      */
     protected function getTaskContext($context = null)
     {

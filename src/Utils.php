@@ -6,6 +6,12 @@ namespace Sweetchuck\Robo\PhpLint;
 
 class Utils
 {
+
+    /**
+     * @param iterable<string, string> $pairs
+     *
+     * @return array<string>
+     */
     public static function buildKeyValueStrings(iterable $pairs): array
     {
         $strings = [];
@@ -16,7 +22,7 @@ class Utils
         return $strings;
     }
 
-    public static function buildKeyValueString($key, $value): string
+    public static function buildKeyValueString(string $key, string $value): string
     {
         return "$key=$value";
     }

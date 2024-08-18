@@ -1,0 +1,38 @@
+parameters:
+	typeAliases:
+		robo-php-lint-task-lint-base-options: '''
+			array{
+				assetNamePrefix?: string,
+				workingDirectory?: string,
+				phpExecutable?: string,
+			}
+		'''
+		robo-php-lint-task-lint-files-options: '''
+			array{
+				assetNamePrefix?: string,
+				workingDirectory?: string,
+				phpExecutable?: string,
+				fileListerCommand?: string,
+				fileNamePatterns?: array<string>,
+				parallelizer?: string|\Sweetchuck\Robo\PhpLint\Parallelizer,
+			}
+		'''
+		robo-php-lint-task-lint-input-options: '''
+			array{
+				files?: array<robo-php-lint-input-file>,
+			}
+		'''
+		robo-php-lint-input-file: '''
+			array{
+				fileName?: string,
+				content?: string,
+				command?: string,
+			}
+		'''
+		robo-php-lint-input-file-full: '''
+			array{
+				fileName: string,
+				content?: string,
+				command?: string,
+			}
+		'''

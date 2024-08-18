@@ -1,0 +1,16 @@
+parameters:
+	typeAliases:
+		robo-php-lint-process-result: '''
+			array{
+				stdOutput: string,
+				stdError: string,
+				exitCode: int,
+			}
+		'''
+		robo-php-lint-php-executable: '''
+			array{
+				enabled: bool,
+				command: string,
+				envVars?: array<string, null|string>,
+			}
+		'''

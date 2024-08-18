@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Robo\PhpLint\Tests\Helper\RoboFiles;
 
+use Consolidation\AnnotatedCommand\Attributes\Command;
+use Consolidation\AnnotatedCommand\Attributes\Help;
 use Robo\Tasks;
 use Sweetchuck\Robo\PhpLint\PhpLintTaskLoader;
 use Robo\Contract\TaskInterface;
@@ -23,13 +25,17 @@ class PhpLintRoboFile extends Tasks
     }
 
     /**
-     * @command php-lint:files:default
+     * @phpstan-param array<string, mixed> $options
      */
-    public function phpLintFilesDefault(
+    #[Command(name: 'php-lint:files:default')]
+    #[Help(
+        description: 'Lint files',
+    )]
+    public function cmdPhpLintFilesDefaultExecute(
         array $options = [
             'parallelizer' => '',
             'fileNamePatterns' => [],
-        ]
+        ],
     ): TaskInterface {
         $lintOptions = array_filter(array_intersect_key(
             $options,
@@ -43,13 +49,17 @@ class PhpLintRoboFile extends Tasks
     }
 
     /**
-     * @command php-lint:files:custom
+     * @phpstan-param array<string, mixed> $options
      */
+    #[Command(name: 'php-lint:files:custom')]
+    #[Help(
+        description: 'Lint files with custom file finder command',
+    )]
     public function phpLintFilesCustom(
         array $options = [
             'parallelizer' => '',
             'fileNamePattern' => '*.php',
-        ]
+        ],
     ): TaskInterface {
         $fileListerCommand = sprintf(
             "find ./tests/_data/fixtures -name %s -print0",
@@ -64,20 +74,25 @@ class PhpLintRoboFile extends Tasks
             ])
         );
 
+        // @phpstan-ignore method.notFound
         return $this
             ->taskPhpLintFiles(array_filter($lintOptions))
             ->setFileListerCommand($fileListerCommand);
     }
 
     /**
-     * @command php-lint:input:command
+     * @phpstan-param array<string, mixed> $options
      */
-    public function phpLintInputCommand(
+    #[Command(name: 'php-lint:input:command')]
+    #[Help(
+        description: 'Lint stdOutput of a command',
+    )]
+    public function cmdPhpLintInputCommandExecute(
         array $options = [
             'workingDirectory' => '',
             'fileNamePattern' => '',
             'withOutput' => false,
-        ]
+        ],
     ): TaskInterface {
         $workingDirectory = $options['workingDirectory'];
         $fileNamePattern = $options['fileNamePattern'];

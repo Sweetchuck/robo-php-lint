@@ -11,13 +11,23 @@ class LintInputTask extends BaseTask
     protected string $taskName = 'PHP Lint input';
 
     // region files
+
+    /**
+     * @phpstan-var array<robo-php-lint-input-file>
+     */
     protected array $files = [];
 
+    /**
+     * @phpstan-return array<robo-php-lint-input-file>
+     */
     public function getFiles(): array
     {
         return $this->files;
     }
 
+    /**
+     * @phpstan-param array<robo-php-lint-input-file> $files
+     */
     public function setFiles(array $files): static
     {
         $this->files = $files;
@@ -26,8 +36,14 @@ class LintInputTask extends BaseTask
     }
     // endregion
 
-    protected array $currentFile = [];
+    /**
+     * @phpstan-var robo-php-lint-input-file-full
+     */
+    protected array $currentFile;
 
+    /**
+     * @phpstan-param robo-php-lint-task-lint-input-options $options
+     */
     public function setOptions(array $options): static
     {
         parent::setOptions($options);
@@ -85,13 +101,21 @@ class LintInputTask extends BaseTask
         return $this;
     }
 
-    protected function normalizeFile(string $fileName, $file): array
+    /**
+     * @phpstan-param string|robo-php-lint-input-file $file
+     *
+     * @phpstan-return robo-php-lint-input-file-full
+     */
+    protected function normalizeFile(string $fileName, string|array $file): array
     {
         return is_array($file) ?
             $file + ['fileName' => $fileName]
             : ['fileName' => $fileName, 'content' => $file];
     }
 
+    /**
+     * @phpstan-param robo-php-lint-input-file $file
+     */
     protected function getMainCommand(array $file): string
     {
         return sprintf(
@@ -106,16 +130,19 @@ class LintInputTask extends BaseTask
         return parent::getPhpCommand() . ' 1>/dev/null';
     }
 
+    /**
+     * @phpstan-param robo-php-lint-input-file $file
+     */
     protected function getContentCommand(array $file): string
     {
         if (isset($file['content'])) {
             return sprintf(
                 'echo -n %s',
-                escapeshellarg($file['content'])
+                escapeshellarg($file['content']),
             );
         }
 
-        return $file['command'];
+        return $file['command'] ?? 'false';
     }
 
     protected function processRunCallback(string $type, string $data): void

@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Sweetchuck\Robo\PhpLint\Task;
 
+use Sweetchuck\Robo\PhpLint\Parallelizer;
+
 class LintFilesTask extends BaseTask
 {
     protected string $taskName = 'PHP Lint files';
@@ -32,13 +34,22 @@ class LintFilesTask extends BaseTask
     // endregion
 
     // region fileNamePatterns
+    /**
+     * @var array<string>
+     */
     protected array $fileNamePatterns = [];
 
+    /**
+     * @return array<string>
+     */
     public function getFileNamePatterns(): array
     {
         return $this->fileNamePatterns;
     }
 
+    /**
+     * @param array<string> $value
+     */
     public function setFileNamePatterns(array $value): static
     {
         $this->fileNamePatterns = $value;
@@ -48,20 +59,14 @@ class LintFilesTask extends BaseTask
     // endregion
 
     // region parallelizer
-    protected string $parallelizer = 'auto';
+    protected Parallelizer $parallelizer = Parallelizer::Auto;
 
-    public function getParallelizer(): string
+    public function getParallelizer(): Parallelizer
     {
         return $this->parallelizer;
     }
 
-    /**
-     * Allowed values:
-     *   - parallel: Uses "parallel" to run commands parallel.
-     *   - xargs: Uses "xargs" to run commands parallel.
-     *   - auto: Tries to detect existence of "parallel" first, then "xargs".
-     */
-    public function setParallelizer(string $value): static
+    public function setParallelizer(Parallelizer $value): static
     {
         $this->parallelizer = $value;
 
@@ -71,6 +76,9 @@ class LintFilesTask extends BaseTask
 
     // endregion
 
+    /**
+     * @phpstan-param robo-php-lint-task-lint-files-options $options
+     */
     public function setOptions(array $options): static
     {
         parent::setOptions($options);
@@ -84,7 +92,11 @@ class LintFilesTask extends BaseTask
         }
 
         if (array_key_exists('parallelizer', $options)) {
-            $this->setParallelizer($options['parallelizer']);
+            $this->setParallelizer(
+                is_string($options['parallelizer'])
+                    ? Parallelizer::from($options['parallelizer'])
+                    : $options['parallelizer'],
+            );
         }
 
         return $this;
@@ -98,7 +110,7 @@ class LintFilesTask extends BaseTask
 
         if ($parallelizerCommand) {
             $parallelizerCommandType = $this->getFinalParallelizerCommandType();
-            if ($parallelizerCommandType === 'parallel') {
+            if ($parallelizerCommandType === Parallelizer::Parallel) {
                 $phpCommand = escapeshellarg($phpCommand . ' {} 1>/dev/null');
             }
 
@@ -147,16 +159,11 @@ class LintFilesTask extends BaseTask
 
     protected function getParallelizerCommand(): ?string
     {
-        $parallelizerCommandType = $this->getFinalParallelizerCommandType();
-        if ($parallelizerCommandType === 'xargs') {
-            return $this->getParallelizerCommandXargs();
-        }
-
-        if ($parallelizerCommandType === 'parallel') {
-            return $this->getParallelizerCommandParallel();
-        }
-
-        return null;
+        return match ($this->getFinalParallelizerCommandType()) {
+            Parallelizer::Parallel => $this->getParallelizerCommandParallel(),
+            Parallelizer::Xargs => $this->getParallelizerCommandXargs(),
+            default => null,
+        };
     }
 
     protected function getParallelizerCommandParallel(): string
@@ -169,24 +176,24 @@ class LintFilesTask extends BaseTask
         return 'xargs -0 --max-args=1 --max-procs="$(nproc)"';
     }
 
-    protected function getFinalParallelizerCommandType(): string
+    protected function getFinalParallelizerCommandType(): ?Parallelizer
     {
         $parallelizerCommandType = $this->getParallelizer();
-        if ($parallelizerCommandType === 'auto') {
+        if ($parallelizerCommandType->value === 'auto') {
             $parallelizerCommandType = $this->autodetectParallelizerCommandType();
         }
 
         return $parallelizerCommandType;
     }
 
-    protected function autodetectParallelizerCommandType(): string
+    protected function autodetectParallelizerCommandType(): ?Parallelizer
     {
-        foreach (['parallel', 'xargs'] as $parallelizer) {
-            if ($this->isShellCallable($parallelizer)) {
-                return $parallelizer;
+        foreach (['parallel', 'xargs'] as $value) {
+            if ($this->isShellCallable($value)) {
+                return Parallelizer::from($value);
             }
         }
 
-        return 'none';
+        return null;
     }
 }

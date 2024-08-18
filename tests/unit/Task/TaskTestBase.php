@@ -15,7 +15,6 @@ use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyOutput;
 use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcess;
 use Sweetchuck\Codeception\Module\RoboTaskRunner\DummyProcessHelper;
 use Sweetchuck\Robo\PhpLint\Task\BaseTask;
-use Sweetchuck\Robo\PhpLint\Task\LintFilesTask;
 use Sweetchuck\Robo\PhpLint\Tests\Helper\Dummy\DummyTaskBuilder;
 use Sweetchuck\Robo\PhpLint\Tests\UnitTester;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -32,7 +31,7 @@ abstract class TaskTestBase extends Unit
 
     protected DummyTaskBuilder $taskBuilder;
 
-    public function _before()
+    public function _before(): void
     {
         parent::_before();
 

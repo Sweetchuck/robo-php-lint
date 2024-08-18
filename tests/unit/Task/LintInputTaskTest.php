@@ -5,14 +5,15 @@ declare(strict_types = 1);
 namespace Sweetchuck\Robo\PhpLint\Tests\Unit\Task;
 
 use Codeception\Attribute\DataProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use Sweetchuck\Robo\PhpLint\PhpLintTaskLoader;
 use Sweetchuck\Robo\PhpLint\Task\BaseTask;
 use Sweetchuck\Robo\PhpLint\Task\LintInputTask;
 
-/**
- * @covers \Sweetchuck\Robo\PhpLint\Task\LintInputTask
- * @covers \Sweetchuck\Robo\PhpLint\Task\BaseTask
- * @covers \Sweetchuck\Robo\PhpLint\PhpLintTaskLoader
- */
+#[CoversClass(LintInputTask::class)]
+#[CoversClass(BaseTask::class)]
+#[CoversTrait(PhpLintTaskLoader::class)]
 class LintInputTaskTest extends TaskTestBase
 {
 
@@ -24,7 +25,10 @@ class LintInputTaskTest extends TaskTestBase
         return new LintInputTask();
     }
 
-    public function casesBuildCommand(): array
+    /**
+     * @return array<string, mixed>
+     */
+    public static function casesBuildCommand(): array
     {
         $phpCommand = implode(' ', [
             'php',
@@ -88,12 +92,19 @@ class LintInputTaskTest extends TaskTestBase
         ];
     }
 
+    /**
+     * @param array<string> $expected
+     * @param array<string, mixed> $options
+     */
     #[DataProvider('casesBuildCommand')]
-    public function testBuildCommand(array $expected, array $options = []): void
-    {
+    public function testBuildCommand(
+        array $expected,
+        array $options = [],
+    ): void {
         $task = $this->createTask();
         $this->tester->assertSame(
             $expected,
+            // @phpstan-ignore method.notFound
             $task->setOptions($options)->buildCommand(),
         );
     }
