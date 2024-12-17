@@ -229,9 +229,9 @@ class LintFilesCest extends LintCestBase
             'parallel --null ' . escapeshellarg("php -n $phpDefinitions -l {} 1>/dev/null"),
         ]);
 
-        $I->assertSame($expectedExitCode, $exitCode);
-        $I->assertSame($expectedStdOutput, $stdOutput);
-        $I->assertStringContainsString($expectedStdError, $stdError);
+        $I->assertSame($expectedExitCode, $exitCode, 'exitCode');
+        $I->assertSame($expectedStdOutput, $stdOutput, 'stdOutput');
+        $I->assertStringContainsString($expectedStdError, $stdError, 'stdError');
     }
 
     public function phpLintFilesCustomFalseXargs(AcceptanceTester $I): void

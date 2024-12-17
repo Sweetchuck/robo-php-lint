@@ -57,14 +57,14 @@ class LintInputCest extends LintCestBase
         $stdOutput = $I->getRoboTaskStdOutput($id);
         $stdError = $I->getRoboTaskStdError($id);
 
-        $pattern = " [PHP Lint input]  Parse error: syntax error, unexpected end of file in $fixturesDir/%s on line %d";
+        $pattern = " [PHP Lint input]  Parse error: syntax error, unexpected token \"*\" in $fixturesDir/%s on line %d";
 
         $expectedExitCode = 255;
         $expectedStdOutput = '';
         $expectedStdError = [
             ' [PHP Lint input] 2 files' . PHP_EOL,
-            sprintf($pattern, 'false.01.php', 11),
-            sprintf($pattern, 'false.02.php', 11),
+            sprintf($pattern, 'false.01.php', 10),
+            sprintf($pattern, 'false.02.php', 10),
         ];
 
         $I->assertSame($expectedExitCode, $exitCode);
