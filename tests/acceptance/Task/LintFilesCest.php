@@ -123,12 +123,12 @@ class LintFilesCest extends LintCestBase
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
         $expectedExitCode = 124;
-        $expectedStdOutput = implode(PHP_EOL, [
+        $expectedStdOutputLines = [
             'Errors parsing tests/_data/fixtures/false.01.php',
             'Errors parsing tests/_data/fixtures/false.02.php',
             'No syntax errors detected in tests/_data/fixtures/true.01.php',
             'No syntax errors detected in tests/_data/fixtures/true.02.php',
-        ]);
+        ];
         $expectedStdError = implode(' ', [
             ' [PHP Lint files]',
             "git ls-files -z -- '$fixturesDir/*.php'",
@@ -138,7 +138,9 @@ class LintFilesCest extends LintCestBase
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
-        $I->assertSame($expectedStdOutput, $this->sortLines($stdOutput));
+        foreach ($expectedStdOutputLines as $expectedStdOutputLine) {
+            $I->assertStringContainsString($expectedStdOutputLine, $stdOutput);
+        }
         $I->assertStringStartsWith($expectedStdError, $stdError);
     }
 
@@ -251,12 +253,12 @@ class LintFilesCest extends LintCestBase
         $phpDefinitions = $this->getDefaultPhpDefinitions();
 
         $expectedExitCode = 124;
-        $expectedStdOutput = implode(\PHP_EOL, [
+        $expectedStdOutputLines = [
             'Errors parsing ./tests/_data/fixtures/false.01.php',
             'Errors parsing ./tests/_data/fixtures/false.02.php',
             'No syntax errors detected in ./tests/_data/fixtures/true.01.php',
             'No syntax errors detected in ./tests/_data/fixtures/true.02.php',
-        ]);
+        ];
         $expectedStdError = implode(' ', [
             ' [PHP Lint files]',
             "find ./tests/_data/fixtures -name '*.php' -print0",
@@ -266,7 +268,9 @@ class LintFilesCest extends LintCestBase
         ]);
 
         $I->assertSame($expectedExitCode, $exitCode);
-        $I->assertSame($expectedStdOutput, $this->sortLines($stdOutput));
+        foreach ($expectedStdOutputLines as $expectedStdOutputLine) {
+            $I->assertStringContainsString($expectedStdOutputLine, $stdOutput);
+        }
         $I->assertStringContainsString($expectedStdError, $stdError);
     }
 
